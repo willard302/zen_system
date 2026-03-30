@@ -58,11 +58,7 @@ const handleLogout = () => {
         </button>
         <h1 class="text-white text-xl font-bold tracking-tight">User Data</h1>
         <div class="flex items-center gap-2">
-          <div class="zen-logo">
-            <div class="circle circle-1"></div>
-            <div class="circle circle-2"></div>
-            <div class="circle circle-3"></div>
-          </div>
+          <ZenLogo size="sm" />
         </div>
       </div>
     </header>
@@ -180,40 +176,5 @@ const handleLogout = () => {
 
 .sky-gradient {
   background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
-}
-
-.zen-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 32px;
-  height: 32px;
-}
-
-.circle {
-  position: absolute;
-  border-radius: 50%;
-}
-
-.circle-1 {
-  width: 100%;
-  height: 100%;
-  background-color: var(--logo-red);
-  z-index: 1;
-}
-
-.circle-2 {
-  width: 66.67%;
-  height: 66.67%;
-  background-color: var(--logo-yellow);
-  z-index: 2;
-}
-
-.circle-3 {
-  width: 33.33%;
-  height: 33.33%;
-  background-color: var(--logo-green);
-  z-index: 3;
 }
 </style>

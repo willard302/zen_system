@@ -17,11 +17,7 @@ const meditationDescription = ref('Find your center in the clear blue sky')
         <span class="material-symbols-outlined text-white">menu</span>
       </button>
       <div class="flex items-center gap-2">
-        <div class="concentric-logo">
-          <div class="circle-1"></div>
-          <div class="circle-2"></div>
-          <div class="circle-3"></div>
-        </div>
+        <ZenLogo size="sm" />
         <h1 class="text-white font-semibold text-lg tracking-wide">淡江大學禪學社</h1>
       </div>
       <button class="flex items-center justify-center size-10 rounded-full bg-white/20 active:bg-white/30 transition-colors">
@@ -85,38 +81,5 @@ const meditationDescription = ref('Find your center in the clear blue sky')
 
 .timer-ring {
   box-shadow: 0 0 50px rgba(255, 255, 255, 0.5), inset 0 0 20px rgba(14, 165, 233, 0.1);
-}
-
-.concentric-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 24px;
-  height: 24px;
-}
-
-.circle-1 {
-  border: 1.5px solid #FFD700;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  position: absolute;
-}
-
-.circle-2 {
-  border: 1.5px solid #FF6B6B;
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
-  position: absolute;
-}
-
-.circle-3 {
-  border: 1.5px solid #4D96FF;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  position: absolute;
 }
 </style>
