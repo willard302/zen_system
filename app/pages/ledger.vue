@@ -1,0 +1,243 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { Transaction } from '@/types'
+
+definePageMeta({
+  layout: 'default'
+})
+
+const clubBalance = ref('$12,450.80')
+const monthIn = ref('+$2,400')
+const monthOut = ref('-$850')
+
+const transactions: Transaction[] = [
+  {
+    id: 1,
+    icon: 'self_improvement',
+    title: 'Zen Retreat Deposit',
+    category: 'Workshop • 10:45 AM',
+    amount: '+$450.00',
+    status: 'success',
+    time: 'Today'
+  },
+  {
+    id: 2,
+    icon: 'local_florist',
+    title: 'Altar Flowers',
+    category: 'Activity • Yesterday',
+    amount: '-$120.50',
+    status: 'settled',
+    time: 'Yesterday'
+  },
+  {
+    id: 3,
+    icon: 'groups',
+    title: 'Membership Dues',
+    category: 'Collection • Oct 24',
+    amount: '+$1,200.00',
+    status: 'success',
+    time: 'Oct 24'
+  },
+  {
+    id: 4,
+    icon: 'lightbulb_outline',
+    title: 'Room Electricity',
+    category: 'Utilities • Oct 22',
+    amount: '-$340.00',
+    status: 'pending',
+    time: 'Oct 22'
+  }
+]
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'success':
+      return 'bg-emerald-50 text-emerald-600'
+    case 'pending':
+      return 'bg-amber-50 text-amber-600'
+    default:
+      return 'bg-slate-50 text-slate-400'
+  }
+}
+
+const getIconColor = (icon: string) => {
+  if (icon === 'local_florist' || icon === 'lightbulb_outline') {
+    return 'bg-slate-50 text-slate-400'
+  }
+  return 'bg-sky-50 text-sky-500'
+}
+</script>
+
+<template>
+  <!-- Header -->
+    <header class="bg-sky-400 pt-14 pb-4 px-6 sticky top-0 z-30">
+      <div class="flex items-center justify-between">
+        <button class="flex items-center justify-center size-10 rounded-full bg-white/10 text-white transition-active active:scale-95 hover:bg-white/20">
+          <span class="material-symbols-outlined text-2xl">menu</span>
+        </button>
+        <div class="flex items-center gap-3">
+          <div class="flex flex-col items-end">
+            <h2 class="text-white font-bold text-base leading-tight">淡江大學禪學社</h2>
+            <p class="text-white/80 text-[10px] tracking-widest uppercase font-medium">TKU Zen Club</p>
+          </div>
+          <div class="zen-logo">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Balance Card -->
+    <section class="px-6 py-6">
+      <div class="sky-gradient-card p-8 rounded-[32px] relative overflow-hidden shadow-xl shadow-sky-200/50">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        <div class="relative z-10 flex flex-col items-center">
+          <p class="text-white/80 text-xs font-bold uppercase tracking-[0.2em] mb-2">Club Treasury Balance</p>
+          <h1 class="text-5xl font-bold tracking-tight text-white mb-8">{{ clubBalance }}</h1>
+          <div class="flex gap-4 w-full">
+            <button class="flex-1 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-white/30">
+              <span class="material-symbols-outlined text-lg">add_circle</span> New Entry
+            </button>
+            <button class="flex-1 bg-white text-sky-500 py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 hover:shadow-lg">
+              <span class="material-symbols-outlined text-lg">ios_share</span> Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 gap-4 px-6 mb-6">
+      <div class="cloud-card p-4 rounded-2xl flex items-center gap-3">
+        <div class="size-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-500">
+          <span class="material-symbols-outlined">trending_up</span>
+        </div>
+        <div>
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Month In</p>
+          <p class="font-bold text-slate-800 text-base">{{ monthIn }}</p>
+        </div>
+      </div>
+      <div class="cloud-card p-4 rounded-2xl flex items-center gap-3">
+        <div class="size-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+          <span class="material-symbols-outlined">trending_down</span>
+        </div>
+        <div>
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Month Out</p>
+          <p class="font-bold text-slate-800 text-base">{{ monthOut }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <main class="flex-1 px-6 pb-32">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-slate-800">Transaction History</h3>
+        <button class="text-sky-500 text-sm font-semibold hover:text-sky-600 transition-colors">View All</button>
+      </div>
+      <div class="space-y-0">
+        <div
+          v-for="transaction in transactions"
+          :key="transaction.id"
+          class="transaction-item flex items-center justify-between py-5"
+        >
+          <div class="flex items-center gap-4">
+            <div :class="`size-12 rounded-2xl flex items-center justify-center ${getIconColor(transaction.icon)}`">
+              <span class="material-symbols-outlined">{{ transaction.icon }}</span>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-800 text-sm">{{ transaction.title }}</p>
+              <p class="text-xs text-slate-400">{{ transaction.category }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p :class="[
+              'font-bold',
+              transaction.amount.includes('+') ? 'text-sky-500' : 'text-slate-700'
+            ]">
+              {{ transaction.amount }}
+            </p>
+            <span :class="[
+              'inline-block px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider',
+              getStatusColor(transaction.status)
+            ]">
+              {{ transaction.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+</template>
+
+<style scoped>
+:root {
+  --sky-gradient: linear-gradient(135deg, #7DD3FC 0%, #BAE6FD 100%);
+  --cloud-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.08);
+  --ios-blur: saturate(180%) blur(20px);
+  --logo-red: #EF4444;
+  --logo-yellow: #FBBF24;
+  --logo-green: #22C55E;
+}
+
+.sky-gradient-card {
+  background: var(--sky-gradient);
+}
+
+.transaction-item {
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.cloud-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: var(--ios-blur);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--cloud-shadow);
+}
+
+.ios-tab-bar {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: var(--ios-blur);
+}
+
+.zen-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.circle-1 {
+  width: 100%;
+  height: 100%;
+  background-color: var(--logo-red);
+  z-index: 1;
+}
+
+.circle-2 {
+  width: 66.67%;
+  height: 66.67%;
+  background-color: var(--logo-yellow);
+  z-index: 2;
+}
+
+.circle-3 {
+  width: 33.33%;
+  height: 33.33%;
+  background-color: var(--logo-green);
+  z-index: 3;
+}
+</style>
