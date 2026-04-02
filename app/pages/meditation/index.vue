@@ -1,11 +1,111 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 definePageMeta({
   layout: 'default'
 })
 
-const timeRemaining = ref('24:59')
+const totalSeconds = ref(25 * 60 - 1)
+const isPlaying = ref(true)
+let timerInterval: ReturnType<typeof setInterval> | null = null
+
+const isEditing = ref(false)
+const editValue = ref('')
+
+const formattedTime = computed({
+  get() {
+    if (isEditing.value) {
+      return editValue.value
+    }
+    const minutes = Math.floor(totalSeconds.value / 60)
+    const seconds = totalSeconds.value % 60
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  },
+  set(val: string) {
+    editValue.value = val
+  }
+})
+
+const handleFocus = () => {
+  isEditing.value = true
+  const minutes = Math.floor(totalSeconds.value / 60)
+  const seconds = totalSeconds.value % 60
+  editValue.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  if (isPlaying.value) {
+    pauseTimer()
+    isPlaying.value = false
+  }
+}
+
+const handleBlur = (event: Event) => {
+  isEditing.value = false
+  const val = editValue.value.trim()
+  if (!val) return
+
+  let parsedSeconds = 0
+  if (val.includes(':')) {
+    const parts = val.split(':')
+    const min = parseInt(parts[0] || '0', 10) || 0
+    const sec = parseInt(parts[1] || '0', 10) || 0
+    parsedSeconds = min * 60 + sec
+  } else {
+    // Treat integers as minutes
+    const num = parseInt(val, 10)
+    if (!isNaN(num)) {
+      parsedSeconds = num * 60
+    }
+  }
+
+  if (parsedSeconds >= 0) {
+    totalSeconds.value = Math.min(parsedSeconds, 99 * 60 + 59)
+  }
+}
+
+const startTimer = () => {
+  if (timerInterval) return
+  timerInterval = setInterval(() => {
+    if (totalSeconds.value > 0) {
+      totalSeconds.value--
+    } else {
+      pauseTimer()
+      isPlaying.value = false
+    }
+  }, 1000)
+}
+
+const pauseTimer = () => {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
+  }
+}
+
+const toggleTimer = () => {
+  isPlaying.value = !isPlaying.value
+  if (isPlaying.value) {
+    startTimer()
+  } else {
+    pauseTimer()
+  }
+}
+
+const jumpTime = (seconds: number) => {
+  const newTime = totalSeconds.value + seconds
+  if (newTime < 0) {
+    totalSeconds.value = 0
+  } else {
+    totalSeconds.value = newTime
+  }
+}
+
+onMounted(() => {
+  startTimer()
+})
+
+onUnmounted(() => {
+  pauseTimer()
+})
+
 const meditationType = ref('Morning Meditation')
 const meditationDescription = ref('Find your center in the clear blue sky')
 </script>
@@ -35,7 +135,15 @@ const meditationDescription = ref('Find your center in the clear blue sky')
         <!-- Timer Display -->
         <div class="size-72 rounded-full border-4 border-white/40 flex items-center justify-center timer-ring bg-white/10 backdrop-blur-sm relative mt-6 mb-6">
           <div class="text-center">
-            <span class="text-6xl font-light text-white tracking-tighter">{{ timeRemaining }}</span>
+            <input 
+              v-model="formattedTime"
+              @focus="handleFocus"
+              @blur="handleBlur"
+              @keydown.enter="($event.target as HTMLInputElement).blur()"
+              type="text"
+              maxlength="5"
+              class="text-6xl font-light text-white tracking-tighter bg-transparent border-none text-center outline-none w-48 p-0 focus:ring-0"
+            />
             <p class="text-white/70 text-sm font-medium mt-2 tracking-widest uppercase">Remaining</p>
           </div>
           <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 size-4 bg-white rounded-full shadow-lg"></div>
@@ -49,13 +157,13 @@ const meditationDescription = ref('Find your center in the clear blue sky')
 
         <!-- Control Buttons -->
         <div class="flex items-center gap-8">
-          <button class="size-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-sky-700 transition-transform active:scale-95 hover:bg-white/40">
+          <button @click="jumpTime(-10)" class="size-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-sky-700 transition-transform active:scale-95 hover:bg-white/40">
             <span class="material-symbols-outlined text-3xl">replay_10</span>
           </button>
-          <button class="size-20 rounded-full bg-white flex items-center justify-center text-sky-500 shadow-xl shadow-sky-400/20 transition-transform active:scale-95 hover:shadow-xl">
-            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1">pause</span>
+          <button @click="toggleTimer" class="size-20 rounded-full bg-white flex items-center justify-center text-sky-500 shadow-xl shadow-sky-400/20 transition-transform active:scale-95 hover:shadow-xl">
+            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1">{{ isPlaying ? 'pause' : 'play_arrow' }}</span>
           </button>
-          <button class="size-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-sky-700 transition-transform active:scale-95 hover:bg-white/40">
+          <button @click="jumpTime(10)" class="size-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-sky-700 transition-transform active:scale-95 hover:bg-white/40">
             <span class="material-symbols-outlined text-3xl">forward_10</span>
           </button>
         </div>
