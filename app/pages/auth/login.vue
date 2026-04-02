@@ -90,7 +90,7 @@ const handleLogin = () => {
 
           <!-- Links -->
           <div class="flex justify-between px-2">
-            <NuxtLink to="#" class="text-white/80 text-sm hover:text-white transition-colors">Forgot Password?</NuxtLink>
+            <NuxtLink to="/auth/forgetPassword" class="text-white/80 text-sm hover:text-white transition-colors">Forgot Password?</NuxtLink>
             <NuxtLink to="/auth/register" class="text-white/80 text-sm font-semibold hover:text-white transition-colors border-b border-white/30">Sign Up</NuxtLink>
           </div>
         </div>
