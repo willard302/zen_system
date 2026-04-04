@@ -1,50 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { Activity, TabbarItem } from '@/types'
+import { onMounted } from 'vue'
 
 definePageMeta({
   layout: 'default'
 })
 
-const userProfile = {
-  name: 'User Name',
-  role: 'Club Member',
-  joinDate: 'Since 2024',
-  totalMeditation: '12.5h',
-  monthlyCheckIns: '8次',
-  department: 'Department Name',
-  studentId: '410012345'
-}
+// 從 Logic Layer 取得邏輯與狀態
+const { 
+  userProfile, 
+  recentActivities, 
+  isLoading,
+  loadUserData, 
+  handleLogout 
+} = useUser()
 
-const recentActivities: Activity[] = [
-  {
-    type: 'meditation',
-    date: 'Today',
-    title: 'Morning Meditation',
-    duration: '30 mins',
-    icon: 'self_improvement'
-  },
-  {
-    type: 'event',
-    date: 'Yesterday',
-    title: 'Weekly Gathering',
-    duration: '1 hour',
-    icon: 'groups'
-  },
-  {
-    type: 'meditation',
-    date: 'Mar 28',
-    title: 'Evening Session',
-    duration: '45 mins',
-    icon: 'self_improvement'
-  }
-]
-
-const router = useRouter()
-
-const handleLogout = () => {
-  router.push('/auth/login')
-}
+onMounted(() => {
+  loadUserData()
+})
 </script>
 
 <template>
@@ -66,7 +38,10 @@ const handleLogout = () => {
     <!-- Main Content -->
     <main class="flex-1 -mt-14 px-4 pb-24 relative z-20 overflow-y-auto">
       <!-- Profile Info Card -->
-      <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-6 flex flex-col items-center text-center mb-6">
+      <div v-if="isLoading" class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-6 flex items-center justify-center min-h-64 mb-6">
+        <span class="material-symbols-outlined animate-spin text-4xl text-sky-500">sync</span>
+      </div>
+      <div v-else-if="userProfile" class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-6 flex flex-col items-center text-center mb-6">
         <div class="relative -mt-20 mb-4 p-2 bg-white dark:bg-slate-800 rounded-full shadow-lg">
           <div class="w-32 h-32 rounded-full bg-sky-100 flex items-center justify-center border-4 border-sky-50">
             <span class="material-symbols-outlined text-sky-300 text-6xl">person</span>
