@@ -15,10 +15,10 @@ export const useTabbarConfig = () => {
   const routeToIndexMap: Record<string, number> = {
     '/': 0,
     '/ledger': 1,
-    '/meditation': 2, // 💡 提醒：依照你之前的配置，Meditation 應該是第三個 Tab (Index 2)
-    '/settings': 3,
-    '/userCenter': 3,
-    '/userData': 3
+    '/meditation': 2,
+    '/calendar': 3,
+    '/settings': 0,
+    '/userData': 0
   }
 
   // 2. 計算當前的 activeIndex，如果找不到匹配的路徑，預設亮起第一個 (0)

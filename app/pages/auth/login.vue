@@ -16,7 +16,7 @@ const showPassword = ref(false)
 const handleLogin = () => {
   const router = useRouter();
   console.log('Login with:', formData.value)
-  router.push('/userCenter')
+  router.push('/')
   
   // TODO: Implement login logic
 }
