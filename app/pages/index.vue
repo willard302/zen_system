@@ -1,99 +1,31 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { Event } from '@/types'
-import {
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  isSameMonth,
-  isSameDay,
-  format,
-  add,
-  sub
-} from 'date-fns'
+import { onMounted } from 'vue'
 
 definePageMeta({
   layout: 'default'
 })
 
-const today = ref(new Date())
-const currentDate = ref(new Date())
-const selectedDate = ref(today.value)
+// 從 Controller 取得處理好的狀態與操作方法
+const {
+  selectedDate, 
+  monthYear, 
+  calendarGrid,
+  isToday, 
+  isSelected, 
+  isCurrentMonth,
+  selectDate, 
+  previousMonth, 
+  nextMonth,
+  eventsForSelectedDate, 
+  eventsInMonth,
+  format, 
+  loadEvents, 
+  isCalendarLoading
+} = useCalendar()
 
-const monthYear = computed(() => format(currentDate.value, 'MMMM yyyy'))
-
-const calendarGrid = computed(() => {
-  const startOfMonthDate = startOfMonth(currentDate.value)
-  const endOfMonthDate = endOfMonth(currentDate.value)
-  const startDate = startOfWeek(startOfMonthDate, { weekStartsOn: 1 })
-  const endDate = endOfWeek(endOfMonthDate, { weekStartsOn: 1 })
-
-  return eachDayOfInterval({ start: startDate, end: endDate })
-})
-
-const isToday = (date: Date) => isSameDay(date, today.value)
-const isSelected = (date: Date) => isSameDay(date, selectedDate.value)
-const isCurrentMonth = (date: Date) => isSameMonth(date, currentDate.value)
-
-const selectDate = (date: Date) => {
-  selectedDate.value = date
-}
-
-const previousMonth = () => {
-  currentDate.value = sub(currentDate.value, { months: 1 })
-}
-
-const nextMonth = () => {
-  currentDate.value = add(currentDate.value, { months: 1 })
-}
-
-const allEvents: Event[] = [
-  {
-    id: 1,
-    date: new Date(),
-    time: '09:00',
-    period: 'AM',
-    title: 'Morning Zen Meditation',
-    icon: 'self_improvement',
-    location: 'Activity Center Room 302',
-    attendees: 15
-  },
-  {
-    id: 2,
-    date: new Date(),
-    time: '12:30',
-    period: 'PM',
-    title: 'Mindful Lunch Meetup',
-    icon: 'restaurant',
-    location: 'Vegetarian Dining Hall',
-    attendees: 8
-  },
-  {
-    id: 3,
-    date: add(new Date(), { days: 4 }),
-    time: '18:00',
-    period: 'PM',
-    title: 'Evening Chanting',
-    icon: 'mosque',
-    location: 'Meditation Hall',
-    attendees: 12
-  }
-]
-
-const eventsForSelectedDate = computed(() => {
-  return allEvents.filter(event => isSameDay(event.date, selectedDate.value))
-})
-
-const eventsInMonth = computed(() => {
-  const eventsMap = new Map<number, boolean>()
-  allEvents.forEach(event => {
-    if (isSameMonth(event.date, currentDate.value)) {
-      eventsMap.set(event.date.getDate(), true)
-    }
-  })
-  return eventsMap
+// 載入初始資料
+onMounted(() => {
+  loadEvents()
 })
 </script>
 

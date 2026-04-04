@@ -11,16 +11,7 @@ export interface TabbarItem {
 /**
  * Common Data Types
  */
-export interface Event {
-  id: number
-  date: Date
-  time: string
-  period: 'AM' | 'PM'
-  title: string
-  icon: string
-  location:string
-  attendees: number
-}
+export * from './event'
 
 export interface Activity {
   type: 'meditation' | 'event'
