@@ -6,4 +6,5 @@ export interface UserProfile {
   monthlyCheckIns: string
   department: string
   studentId: string
+  avatar?: string
 }

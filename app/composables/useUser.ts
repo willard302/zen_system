@@ -8,11 +8,13 @@ import type { UserProfile, Activity } from '@/types'
  */
 export function useUser() {
   const router = useRouter()
-  
+  const supabase = useSupabaseClient()
+
   // 狀態 (State)
   const userProfile = ref<UserProfile | null>(null)
   const recentActivities = ref<Activity[]>([])
   const isLoading = ref(false)
+  const isUploadingAvatar = ref(false)
   const error = ref<string | null>(null)
 
   // 動作 (Actions)
@@ -25,7 +27,7 @@ export function useUser() {
         userService.fetchUserProfile(),
         userService.fetchRecentActivities()
       ])
-      
+
       userProfile.value = profileData
       recentActivities.value = activitiesData
     } catch (err: any) {
@@ -36,10 +38,34 @@ export function useUser() {
     }
   }
 
+  const uploadAvatar = async (file: File) => {
+    if (!userProfile.value) return
+
+    isUploadingAvatar.value = true
+    error.value = null
+
+    try {
+      // 上傳新大頭照
+      const avatarUrl = await userService.uploadAvatar(file, supabase)
+
+      // 更新本地狀態
+      userProfile.value.avatar = avatarUrl
+
+      // 重新載入用戶資料確保資料一致性
+      await loadUserData()
+    } catch (err: any) {
+      error.value = err.message || 'Failed to upload avatar'
+      console.error(err)
+      throw err
+    } finally {
+      isUploadingAvatar.value = false
+    }
+  }
+
   const handleLogout = () => {
     // 這裡可以處理清除 Token 等邏輯
     // ...
-    
+
     // 跳轉回登入頁
     router.push('/auth/login')
   }
@@ -48,8 +74,10 @@ export function useUser() {
     userProfile,
     recentActivities,
     isLoading,
+    isUploadingAvatar,
     error,
     loadUserData,
+    uploadAvatar,
     handleLogout
   }
 }

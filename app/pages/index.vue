@@ -5,17 +5,64 @@ definePageMeta({
   layout: 'default'
 })
 
-const userProfile = {
-  name: '陳大文',
-  roles: ['核心成員', '財務長'],
-  department: '資訊工程學系',
-  studentId: '410012345',
-  profileImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPTwNfZkkvdSNnk4ggyWDVBsgX2YyHOr7gZn1yeVJhBSbDBO-_Ov-Qotvm9w1XQIxy0-ZBlAO73mbDWsnYwBHv7LiygGiTz42BeNKRymX74nsMo6w5SnEf_fNrsWfRC01U2yzyxH3YZHHB1QgwAzkBQRVmmemS9D6xIrR_xtzyELSYIkvpFLfp8wGQ-jDnbQz0QTGOYR7BVMLOlrEaagVU2j7xZVMDxHiBX7ZpnjsrR-HGtqi2gyljt5me9yiOnh6fDiVAU8Wal54'
+// 使用 useUser composable
+const {
+  userProfile,
+  isLoading,
+  isUploadingAvatar,
+  error,
+  loadUserData,
+  uploadAvatar
+} = useUser()
+
+// 使用 Toast
+const { error: showErrorToast } = useToast()
+
+// 載入用戶資料
+onMounted(() => {
+  loadUserData()
+})
+
+// 檔案輸入引用
+const fileInput = ref<HTMLInputElement | null>(null)
+
+// 處理大頭照點擊
+const handleAvatarClick = () => {
+  fileInput.value?.click()
 }
 
+// 處理檔案選擇
+const handleFileSelect = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+
+  if (!file) return
+
+  try {
+    await uploadAvatar(file)
+    // 成功上傳後清除檔案輸入
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  } catch (err: any) {
+    // 顯示錯誤Toast
+    showErrorToast(err.message || '上傳大頭照失敗')
+    // 清除檔案輸入
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
+}
+
+// 獲取大頭照URL，如果沒有則使用預設圖片
+const getAvatarUrl = () => {
+  return userProfile.value?.avatar || 'https://via.placeholder.com/128x128?text=No+Avatar'
+}
+
+// 統計數據
 const stats: StatCard[] = [
-  { icon: 'avg_time', label: '總禪定時數', value: '42.5h' },
-  { icon: 'calendar_month', label: '本月打卡', value: '12次' }
+  { icon: 'avg_time', label: '總禪定時數', value: userProfile.value?.totalMeditation || '0h' },
+  { icon: 'calendar_month', label: '本月打卡', value: userProfile.value?.monthlyCheckIns || '0次' }
 ]
 
 const menuItems: MenuItem[] = [
@@ -35,38 +82,58 @@ const menuItems: MenuItem[] = [
       <!-- Profile Info Card -->
       <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-6 flex flex-col items-center text-center mb-6">
         <div class="relative -mt-20 mb-4 p-2 bg-white dark:bg-slate-800 rounded-full shadow-lg">
-          <div class="w-32 h-32 rounded-full border-4 border-dashed border-primary/30 p-1 overflow-hidden">
+          <div
+            class="w-32 h-32 rounded-full border-4 border-dashed border-primary/30 p-1 overflow-hidden cursor-pointer transition-transform hover:scale-105 relative"
+            @click="handleAvatarClick"
+          >
+            <!-- Loading overlay -->
+            <div
+              v-if="isUploadingAvatar"
+              class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center z-10"
+            >
+              <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+
             <div
               class="w-full h-full rounded-full bg-cover bg-center"
-              :style="{ backgroundImage: `url('${userProfile.profileImage}')` }"
+              :style="{ backgroundImage: `url('${getAvatarUrl()}')` }"
             ></div>
+
+            <!-- Upload hint -->
+            <div class="absolute inset-0 bg-black/0 hover:bg-black/20 rounded-full flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-white opacity-0 hover:opacity-100 transition-opacity">photo_camera</span>
+            </div>
           </div>
         </div>
+
+        <!-- Hidden file input -->
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/*"
+          class="hidden"
+          @change="handleFileSelect"
+        />
+
         <div class="mb-4">
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">{{ userProfile.name }}</h2>
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
+            {{ userProfile?.name || '載入中...' }}
+          </h2>
           <div class="flex items-center justify-center gap-2 mt-2 flex-wrap">
-            <span
-              v-for="role in userProfile.roles"
-              :key="role"
-              :class="[
-                'text-sm font-semibold px-3 py-1 rounded-full border',
-                role === '核心成員'
-                  ? 'bg-primary/10 text-primary border-primary/20'
-                  : 'bg-amber-100 text-amber-700 border-amber-200'
-              ]"
-            >
-              {{ role }}
+            <span class="text-sm font-semibold px-3 py-1 rounded-full border bg-primary/10 text-primary border-primary/20">
+              {{ userProfile?.role || '會員' }}
             </span>
           </div>
         </div>
+
         <div class="w-full grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-700 pt-4">
           <div class="text-left">
             <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">學系</p>
-            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile.department }}</p>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile?.department || '載入中...' }}</p>
           </div>
           <div class="text-right">
             <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">學號</p>
-            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile.studentId }}</p>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile?.studentId || '載入中...' }}</p>
           </div>
         </div>
       </div>
