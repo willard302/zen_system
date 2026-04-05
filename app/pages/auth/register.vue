@@ -15,10 +15,47 @@ const formData = ref<RegisterFormData>({
 })
 
 const showPassword = ref(false)
+const supabase = useSupabaseClient()
+const loading = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
 
-const handleRegister = () => {
-  console.log('Register with:', formData.value)
-  // TODO: Implement registration logic
+const handleRegister = async () => {
+  if (formData.value.password !== formData.value.confirmPassword) {
+    errorMessage.value = 'Passwords do not match.'
+    return
+  }
+  
+  if (!formData.value.email || !formData.value.password) {
+    errorMessage.value = 'Please enter both email and password.'
+    return
+  }
+
+  try {
+    loading.value = true
+    errorMessage.value = ''
+    successMessage.value = ''
+    
+    // We can store the student ID in user metadata
+    const { error } = await supabase.auth.signUp({
+      email: formData.value.email,
+      password: formData.value.password,
+      options: {
+        data: {
+          student_id: formData.value.studentId,
+        }
+      }
+    })
+    
+    if (error) throw error
+    
+    successMessage.value = 'Registration successful! Please check your email to verify your account.'
+    
+  } catch (error: any) {
+    errorMessage.value = error.message || 'An error occurred during registration.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 <template>
@@ -123,11 +160,20 @@ const handleRegister = () => {
 
       <!-- Action Buttons -->
       <div class="flex flex-col gap-4 px-6 py-6 mb-10">
+        <!-- Notifications -->
+        <div v-if="errorMessage" class="text-red-500 text-sm py-2 px-4 rounded-lg bg-red-500/10 mb-2">
+          {{ errorMessage }}
+        </div>
+        <div v-if="successMessage" class="text-green-500 text-sm py-2 px-4 rounded-lg bg-green-500/10 mb-2">
+          {{ successMessage }}
+        </div>
+
         <button
           @click="handleRegister"
-          class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+          :disabled="loading"
+          class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Register
+          {{ loading ? 'Registering...' : 'Register' }}
         </button>
         <div class="flex items-center justify-center gap-2 mt-2">
           <p class="text-slate-500 dark:text-slate-400 text-sm">Already have an account?</p>

@@ -30,5 +30,13 @@ export default defineNuxtConfig({
     autoImport: true
   },
 
-  modules: ['@nuxtjs/tailwindcss']
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase'],
+
+  supabase: {
+    redirectOptions: {
+      login: '/auth/login',
+      callback: '/auth/confirm',
+      exclude: ['/auth/*']
+    }
+  }
 })

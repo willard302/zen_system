@@ -12,13 +12,35 @@ const formData = ref<LoginFormData>({
 })
 
 const showPassword = ref(false)
+const supabase = useSupabaseClient()
+const loading = ref(false)
+const errorMessage = ref('')
 
-const handleLogin = () => {
-  const router = useRouter();
-  console.log('Login with:', formData.value)
-  router.push('/')
+const handleLogin = async () => {
+  const router = useRouter()
   
-  // TODO: Implement login logic
+  if (!formData.value.email || !formData.value.password) {
+    errorMessage.value = 'Please enter both email and password.'
+    return
+  }
+
+  try {
+    loading.value = true
+    errorMessage.value = ''
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.value.email,
+      password: formData.value.password,
+    })
+    
+    if (error) throw error
+    
+    router.push('/')
+  } catch (error: any) {
+    errorMessage.value = error.message || 'An error occurred during login.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -80,12 +102,18 @@ const handleLogin = () => {
             </div>
           </div>
 
+          <!-- Error Message -->
+          <div v-if="errorMessage" class="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg">
+            {{ errorMessage }}
+          </div>
+
           <!-- Login Button -->
           <button
             @click="handleLogin"
-            class="w-full bg-primary text-white font-bold py-3 rounded-xl glow-button text-lg tracking-wide hover:bg-primary/90 transition-all active:scale-[0.8]"
+            :disabled="loading"
+            class="w-full bg-primary text-white font-bold py-3 rounded-xl glow-button text-lg tracking-wide hover:bg-primary/90 transition-all active:scale-[0.8] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {{ loading ? 'Logging in...' : 'Login' }}
           </button>
 
           <!-- Links -->
