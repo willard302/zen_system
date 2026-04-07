@@ -43,9 +43,6 @@ onUnmounted(() => {
       <button @click="showDropdown = !showDropdown" class="p-2 text-white hover:bg-white/20 rounded-lg transition-colors">
         <span class="material-symbols-outlined text-white text-3xl">menu</span>
       </button>
-      
-      <!-- Dropdown Background Overlay -->
-      <div v-if="showDropdown" @click="showDropdown = false" class="fixed inset-0 z-40" style="width: 100vw; height: 100vh;"></div>
 
       <!-- Dropdown Menu -->
       <div v-if="showDropdown" class="absolute right-0 top-[110%] mt-2 w-44 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-60 border border-white/60 origin-top-right animate-fade-in">
@@ -53,10 +50,16 @@ onUnmounted(() => {
           <span class="material-symbols-outlined text-[20px] text-sky-600">music_note</span>
           <span class="font-medium text-[15px]">設置鈴聲</span>
         </button>
-        <button @click="showDropdown = false" class="w-full text-left px-5 py-3.5 text-sky-900 hover:bg-sky-50 active:bg-sky-100 transition-colors flex items-center gap-3">
-          <span class="material-symbols-outlined text-[20px] text-sky-600">history</span>
-          <span class="font-medium text-[15px]">禪定紀錄</span>
-        </button>
+        <NuxtLink 
+          to="/meditation/statistics" 
+          @click="showDropdown = false"
+          class="w-full block text-left px-5 py-3.5 text-sky-900 hover:bg-sky-50 active:bg-sky-100 transition-colors border-b border-sky-100/50 rounded-none"
+        >
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px] text-sky-600">bar_chart</span>
+            <span class="font-medium text-[15px]">冥想統計</span>
+          </div>
+        </NuxtLink>
       </div>
     </template>
   </AppHeader>
