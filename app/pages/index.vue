@@ -8,9 +8,7 @@ definePageMeta({
 // 使用 useUser composable
 const {
   userProfile,
-  isLoading,
   isUploadingAvatar,
-  error,
   loadUserData,
   uploadAvatar
 } = useUser()
@@ -74,8 +72,7 @@ const menuItems: MenuItem[] = [
 
 <template>
   <!-- Header Section -->
-  <AppHeader title="個人資料" bg-class="sky-gradient" :has-padding="true">
-  </AppHeader>
+  <AppHeader title="個人資料" bg-class="sky-gradient" :has-padding="true"></AppHeader>
 
     <!-- Main Content -->
     <main class="flex-1 -mt-4 px-4 pb-24 relative z-40">
