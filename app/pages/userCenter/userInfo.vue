@@ -63,7 +63,7 @@ const handleSave = async () => {
 
 // 獲取大頭照 URL
 const getAvatarUrl = () => {
-  return userProfile.value?.avatar || 'https://via.placeholder.com/128x128?text=No+Avatar'
+  return userProfile.value?.avatar || '/images/default-avatar.png'
 }
 
 // 初始化時載入用戶資料
