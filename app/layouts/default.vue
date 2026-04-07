@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useTabbarConfig } from '@/composables/useTabbarConfig'
 import { useToast } from '@/composables/useToast'
 
+const route = useRoute()
 const { tabbarItems, activeIndex } = useTabbarConfig()
 const { toasts, removeToast } = useToast()
+
+const showTabbar = computed(() => {
+  const hideTabbar = (route.meta.hideTabbar as boolean) || false
+  return tabbarItems.length > 0 && !hideTabbar
+})
 </script>
 
 <template>
@@ -24,7 +31,7 @@ const { toasts, removeToast } = useToast()
     </div>
 
     <!-- Tabbar -->
-    <Tabbar v-if="tabbarItems.length > 0" :items="tabbarItems" :active-index="activeIndex" />
+    <Tabbar v-if="showTabbar" :items="tabbarItems" :active-index="activeIndex" />
   </div>
 </template>
 

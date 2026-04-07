@@ -65,7 +65,7 @@ const stats: StatCard[] = [
 
 const menuItems: MenuItem[] = [
   { icon: 'person_edit', label: '編輯個人資料', path: '/userCenter/userInfo' },
-  { icon: 'lock_reset', label: '修改密碼' },
+  { icon: 'lock_reset', label: '修改密碼', path: '/userCenter/changePassword' },
   { icon: 'security', label: '隱私權設定' }
 ]
 </script>

@@ -1,9 +1,9 @@
-# Azure Ethereal Design System
+# iSCIM Player Design System
 
 ### 1. Overview & Creative North Star
 **Creative North Star: "The Celestial Sanctuary"**
 
-Azure Ethereal is a design system that prioritizes atmospheric depth and spiritual clarity over rigid data density. Inspired by the expansive qualities of the sky, it utilizes a "Glassmorphism" foundation to create a sense of weightlessness. The system breaks from traditional "boxed" layouts by using background imagery as a primary structural element, with UI components acting as semi-transparent filters that mediate between the user and the content.
+iSCIM Player is a design system that prioritizes atmospheric depth and spiritual clarity over rigid data density. Inspired by the expansive qualities of the sky, it utilizes a "Glassmorphism" foundation to create a sense of weightlessness. The system breaks from traditional "boxed" layouts by using background imagery as a primary structural element, with UI components acting as semi-transparent filters that mediate between the user and the content.
 
 ### 2. Colors
 The palette is dominated by **Sky Blue (#2b9dee)** and **Ethereal White**, supported by nature-inspired accents like **Zen Green (#4CAF50)**.
@@ -14,7 +14,7 @@ The palette is dominated by **Sky Blue (#2b9dee)** and **Ethereal White**, suppo
 - **Signature Textures:** Utilize `conic-gradients` and `glow-effects` (0 0 20px) to indicate active states or primary actions, mimicking the aura of a natural light source.
 
 ### 3. Typography
-Azure Ethereal uses **Plus Jakarta Sans** across all levels to maintain a modern, geometric clarity that feels approachable yet professional.
+iSCIM Player uses **Plus Jakarta Sans** across all levels to maintain a modern, geometric clarity that feels approachable yet professional.
 
 - **Display (1.875rem / 30px):** Bold, tracking-widest (10-15%). Used for primary brand titles to evoke a sense of monumental calm.
 - **Headline (1.125rem / 18px):** Bold, tracking-wide. Used for primary calls to action within components.

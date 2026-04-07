@@ -16,6 +16,7 @@ export function useUser() {
   const isLoading = ref(false)
   const isUploadingAvatar = ref(false)
   const isUpdatingProfile = ref(false)
+  const isChangingPassword = ref(false)
   const error = ref<string | null>(null)
 
   // 動作 (Actions)
@@ -134,17 +135,54 @@ export function useUser() {
     router.push('/auth/login')
   }
 
+  /**
+   * 修改密碼
+   */
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string
+  ) => {
+    error.value = null
+
+    // 驗證確認密碼是否相同
+    if (newPassword !== confirmPassword) {
+      error.value = '新密碼和確認密碼不相符'
+      throw new Error(error.value)
+    }
+
+    // 驗證新密碼和舊密碼是否不同
+    if (currentPassword === newPassword) {
+      error.value = '新密碼不能與當前密碼相同'
+      throw new Error(error.value)
+    }
+
+    isChangingPassword.value = true
+
+    try {
+      await userService.changePassword(currentPassword, newPassword)
+    } catch (err: any) {
+      error.value = err.message || 'Failed to change password'
+      console.error(err)
+      throw err
+    } finally {
+      isChangingPassword.value = false
+    }
+  }
+
   return {
     userProfile,
     recentActivities,
     isLoading,
     isUploadingAvatar,
     isUpdatingProfile,
+    isChangingPassword,
     error,
     loadUserData,
     uploadAvatar,
     updateDisplayName,
     updateUserProfile,
+    changePassword,
     handleLogout
   }
 }

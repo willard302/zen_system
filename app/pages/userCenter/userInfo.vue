@@ -212,7 +212,7 @@ onBeforeUnmount(async () => {
       </div>
 
       <!-- Save Button -->
-      <div class="pt-4">
+      <div class="pt-4 space-y-3">
         <button 
           @click="handleSave"
           :disabled="isSaving || isLoading"
@@ -221,6 +221,15 @@ onBeforeUnmount(async () => {
           <span v-if="!isSaving" class="material-symbols-outlined">save</span>
           <span v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           {{ isSaving ? '保存中...' : '保存修改' }}
+        </button>
+
+        <!-- Change Password Button -->
+        <button 
+          @click="router.push('/userCenter/changePassword')"
+          class="w-full h-14 bg-white/60 text-sky-600 font-bold rounded-2xl border-2 border-sky-500/30 hover:bg-white/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+        >
+          <span class="material-symbols-outlined">lock</span>
+          修改密碼
         </button>
       </div>
     </main>
