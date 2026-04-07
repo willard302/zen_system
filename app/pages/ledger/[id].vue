@@ -2,8 +2,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLedger } from '@/composables/useLedger'
-import type { Transaction, TransactionFormData } from '@/types/ledger'
-import ZenLogo from '@/components/ZenLogo.vue'
+import type { TransactionFormData } from '@/types/ledger'
+// import ZenLogo from '@/components/ZenLogo.vue'
 
 definePageMeta({
   layout: 'default'
@@ -124,7 +124,7 @@ const handleDelete = async () => {
           <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 leading-tight">{{ isNew ? '新增紀錄' : '編輯紀錄' }}</h2>
         </div>
       </div>
-      <ZenLogo size="sm" />
+      <!-- <ZenLogo size="sm" /> -->
     </header>
 
     <!-- Main Content -->
@@ -165,7 +165,7 @@ const handleDelete = async () => {
           </label>
           <div class="relative flex items-center">
             <span class="absolute left-4 text-slate-500 font-bold">$</span>
-            <input v-model.number="formData.amount" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 pl-8 pr-4 text-base transition-all" type="number" />
+            <input v-model.number="formData.amount" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 pl-8 pr-4 text-base transition-all" type="number" step="0.01" placeholder="0.00" />
           </div>
         </div>
 

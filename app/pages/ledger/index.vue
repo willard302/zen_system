@@ -7,7 +7,6 @@ definePageMeta({
 
 // 從 Controller 取得處理好的狀態與操作方法
 const {
-  isLedgerLoading,
   clubBalance,
   monthIn,
   monthOut,
@@ -99,7 +98,7 @@ onMounted(() => {
           </div>
           <div class="text-right">
             <p :class="[
-              'font-bold',
+              'font-bold px-2',
               transaction.type === 'income' ? 'text-sky-500' : 'text-slate-700'
             ]">
               {{ transaction.amountDisplay }}

@@ -86,9 +86,11 @@ export interface LedgerSummary {
 export function mapDatabaseTransactionToFrontend(
   dbTx: DatabaseTransaction
 ): Transaction {
-  const amount = Math.abs(dbTx.amount)
+  // 確保 amount 是數字
+  const numAmount = typeof dbTx.amount === 'number' ? dbTx.amount : parseFloat(dbTx.amount as any)
+  const amount = Math.abs(numAmount)
   const prefix = dbTx.type === 'income' ? '+' : '-'
-  const amountDisplay = `${prefix}$${amount.toFixed(2)}`
+  const amountDisplay = `${prefix}$${amount.toFixed(0)}`
 
   return {
     ...dbTx,

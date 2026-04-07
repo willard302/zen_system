@@ -48,17 +48,17 @@ export const ledgerService = {
         .reduce((sum, tx) => sum + Math.abs(tx.amount || 0), 0)
 
       return {
-        clubBalance: `$${Math.abs(totalBalance).toFixed(2)}`,
-        monthIn: `+$${monthIncome.toFixed(2)}`,
-        monthOut: `-$${monthExpense.toFixed(2)}`
+        clubBalance: `$${Math.abs(totalBalance).toFixed(0)}`,
+        monthIn: `+$${monthIncome.toFixed(0)}`,
+        monthOut: `-$${monthExpense.toFixed(0)}`
       }
     } catch (error) {
       console.error('Error fetching ledger summary:', error)
       // 返回默認值
       return {
-        clubBalance: '$0.00',
-        monthIn: '+$0.00',
-        monthOut: '-$0.00'
+        clubBalance: '$0',
+        monthIn: '+$0',
+        monthOut: '-$0'
       }
     }
   },

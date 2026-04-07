@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { ledgerService } from '@/services/ledgerService'
-import type { Transaction, TransactionStatus, TransactionFormData } from '@/types/ledger'
-import { mapFormDataToInsert } from '@/types/ledger'
+import type { Transaction, TransactionFormData } from '@/types/ledger'
 
 /**
  * Controller (邏輯層): 控制帳本狀態，介接 View 與 Model
