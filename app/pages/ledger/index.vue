@@ -100,9 +100,9 @@ onMounted(() => {
           <div class="text-right">
             <p :class="[
               'font-bold',
-              transaction.amount.includes('+') ? 'text-sky-500' : 'text-slate-700'
+              transaction.type === 'income' ? 'text-sky-500' : 'text-slate-700'
             ]">
-              {{ transaction.amount }}
+              {{ transaction.amountDisplay }}
             </p>
             <span :class="[
               'inline-block px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider',

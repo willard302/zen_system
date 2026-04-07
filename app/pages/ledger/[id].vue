@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLedger } from '@/composables/useLedger'
-import type { Transaction } from '@/types/ledger'
+import type { Transaction, TransactionFormData } from '@/types/ledger'
 import ZenLogo from '@/components/ZenLogo.vue'
 
 definePageMeta({
@@ -15,21 +15,33 @@ const { getTransaction, saveTransaction, removeTransaction } = useLedger()
 
 const isNew = computed(() => route.params.id === 'new')
 
-const formData = ref<Partial<Transaction>>({
+const formData = ref<Partial<TransactionFormData>>({
   date: new Date().toISOString().split('T')[0],
   title: '',
-  amountValue: 0,
-  requisitioner: '',
-  reviewer: '',
+  amount: 0,
+  requesterId: '',
+  type: 'expense',
   status: 'pending',
-  type: 'expense'
+  category: '',
+  icon: ''
 })
 
 onMounted(async () => {
   if (!isNew.value) {
     const tx = await getTransaction(route.params.id as string)
     if (tx) {
-      formData.value = { ...tx }
+      formData.value = {
+        title: tx.title,
+        date: tx.date,
+        amount: tx.amount,
+        type: tx.type as 'income' | 'expense',
+        requesterId: tx.requesterId,
+        status: tx.status,
+        category: tx.category,
+        icon: tx.icon,
+        financeId: tx.financeId,
+        isApproved: tx.is_approved ?? undefined
+      }
     }
   }
 })
@@ -39,14 +51,30 @@ const goBack = () => {
 }
 
 const handleSave = async () => {
-  // map amount values
-  const rawPrefix = formData.value.type === 'income' ? '+' : '-'
-  formData.value.amount = `${rawPrefix}$${Math.abs(formData.value.amountValue || 0).toFixed(2)}`
-  
-  if (!formData.value.icon) formData.value.icon = formData.value.type === 'income' ? 'savings' : 'receipt_long'
-  if (!formData.value.category) formData.value.category = formData.value.type === 'income' ? 'Income' : 'Expense'
-  
-  await saveTransaction({ ...formData.value, id: isNew.value ? 'new' : route.params.id as string })
+  if (!formData.value.amount || !formData.value.title || !formData.value.date) {
+    alert('請填寫必要欄位')
+    return
+  }
+
+  // 生成最終交易物件
+  const transactionData: Partial<Transaction> = {
+    title: formData.value.title,
+    date: formData.value.date,
+    amount: Math.abs(formData.value.amount),
+    type: formData.value.type,
+    requesterId: formData.value.requesterId,
+    status: formData.value.status,
+    category: formData.value.category || (formData.value.type === 'income' ? 'Income' : 'Expense'),
+    icon: formData.value.icon || (formData.value.type === 'income' ? 'savings' : 'receipt_long'),
+    financeId: formData.value.financeId || '',
+    is_approved: formData.value.isApproved || false
+  }
+
+  // 計算顯示文字
+  const prefix = formData.value.type === 'income' ? '+' : '-'
+  transactionData.amountDisplay = `${prefix}$${(formData.value.amount || 0).toFixed(2)}`
+
+  await saveTransaction({ ...transactionData, id: isNew.value ? 'new' : route.params.id as string })
   goBack()
 }
 
@@ -114,7 +142,7 @@ const handleDelete = async () => {
           </label>
           <div class="relative flex items-center">
             <span class="absolute left-4 text-slate-500 font-bold">$</span>
-            <input v-model.number="formData.amountValue" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 pl-8 pr-4 text-base transition-all" type="number" />
+            <input v-model.number="formData.amount" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 pl-8 pr-4 text-base transition-all" type="number" />
           </div>
         </div>
 
@@ -124,7 +152,7 @@ const handleDelete = async () => {
             <span class="material-symbols-outlined text-sky-500 text-lg">person</span>
             請款人 / 負責人
           </label>
-          <input v-model="formData.requisitioner" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 px-4 text-base transition-all" type="text" />
+          <input v-model="formData.requesterId" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 px-4 text-base transition-all" type="text" />
         </div>
 
         <div class="flex flex-col gap-2">
@@ -132,7 +160,7 @@ const handleDelete = async () => {
             <span class="material-symbols-outlined text-sky-500 text-lg">admin_panel_settings</span>
             財務長
           </label>
-          <input v-model="formData.reviewer" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 px-4 text-base transition-all" placeholder="請輸入財務長姓名" type="text" />
+          <input v-model="formData.financeId" class="form-input flex w-full rounded-xl text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-sky-500/20 border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 h-12 px-4 text-base transition-all" placeholder="請輸入財務長ID" type="text" />
         </div>
 
         <!-- Finance Review Field -->

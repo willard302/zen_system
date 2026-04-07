@@ -14,57 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      accounting_book: {
-        Row: {
-          amount: number
-          category: string
-          created_at: string | null
-          date: string
-          finance_id: string
-          icon: string
-          id: string
-          is_approved: boolean | null
-          receipt_path: string | null
-          requester_id: string
-          status: string
-          title: string
-          type: string
-          updated_at: string | null
-        }
-        Insert: {
-          amount: number
-          category: string
-          created_at?: string | null
-          date: string
-          finance_id: string
-          icon: string
-          id?: string
-          is_approved?: boolean | null
-          receipt_path?: string | null
-          requester_id: string
-          status?: string
-          title: string
-          type: string
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number
-          category?: string
-          created_at?: string | null
-          date?: string
-          finance_id?: string
-          icon?: string
-          id?: string
-          is_approved?: boolean | null
-          receipt_path?: string | null
-          requester_id?: string
-          status?: string
-          title?: string
-          type?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       attendance: {
         Row: {
           created_at: string
@@ -176,6 +125,57 @@ export type Database = {
           recurrence?: Database["public"]["Enums"]["event_recurrence"]
           start_at?: string
           title?: string
+        }
+        Relationships: []
+      }
+      ledger: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          date: string
+          finance_id: string
+          icon: string
+          id: string
+          is_approved: boolean | null
+          receipt_path: string | null
+          requester_id: string
+          status: string
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          date: string
+          finance_id: string
+          icon: string
+          id?: string
+          is_approved?: boolean | null
+          receipt_path?: string | null
+          requester_id: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          date?: string
+          finance_id?: string
+          icon?: string
+          id?: string
+          is_approved?: boolean | null
+          receipt_path?: string | null
+          requester_id?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

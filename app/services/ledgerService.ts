@@ -3,60 +3,72 @@ import type { Transaction, LedgerSummary } from '@/types/ledger'
 // In-memory mock state to simulate a database session
 let mockTransactions: Transaction[] = [
   {
-    id: 1,
+    id: '1',
     icon: 'self_improvement',
     title: 'Zen Retreat Deposit',
-    category: 'Workshop • 10:45 AM',
-    amount: '+$450.00',
-    amountValue: 450,
+    category: 'Workshop',
+    amount: 450,
+    amountDisplay: '+$450.00',
     status: 'success',
-    time: 'Today',
     date: '2023-10-25',
-    requisitioner: 'Admin',
-    reviewer: 'Finance Lead',
-    type: 'income'
+    requesterId: 'admin',
+    financeId: 'finance_lead_1',
+    type: 'income',
+    created_at: '2023-10-25T10:45:00Z',
+    updated_at: null,
+    is_approved: true,
+    receipt_path: null
   },
   {
-    id: 2,
+    id: '2',
     icon: 'local_florist',
     title: 'Altar Flowers',
-    category: 'Activity • Yesterday',
-    amount: '-$120.50',
-    amountValue: 120.5,
+    category: 'Activity',
+    amount: 120.5,
+    amountDisplay: '-$120.50',
     status: 'settled',
-    time: 'Yesterday',
     date: '2023-10-24',
-    requisitioner: 'Jane Doe',
-    reviewer: 'Finance Lead',
-    type: 'expense'
+    requesterId: 'jane_doe',
+    financeId: 'finance_lead_1',
+    type: 'expense',
+    created_at: '2023-10-24T00:00:00Z',
+    updated_at: null,
+    is_approved: true,
+    receipt_path: null
   },
   {
-    id: 3,
+    id: '3',
     icon: 'groups',
     title: 'Membership Dues',
-    category: 'Collection • Oct 24',
-    amount: '+$1,200.00',
-    amountValue: 1200,
+    category: 'Collection',
+    amount: 1200,
+    amountDisplay: '+$1,200.00',
     status: 'success',
-    time: 'Oct 24',
     date: '2023-10-24',
-    requisitioner: 'Tom',
-    reviewer: 'Finance Lead',
-    type: 'income'
+    requesterId: 'tom',
+    financeId: 'finance_lead_1',
+    type: 'income',
+    created_at: '2023-10-24T00:00:00Z',
+    updated_at: null,
+    is_approved: true,
+    receipt_path: null
   },
   {
-    id: 4,
+    id: '4',
     icon: 'lightbulb_outline',
     title: 'Room Electricity',
-    category: 'Utilities • Oct 22',
-    amount: '-$340.00',
-    amountValue: 340,
+    category: 'Utilities',
+    amount: 340,
+    amountDisplay: '-$340.00',
     status: 'pending',
-    time: 'Oct 22',
     date: '2023-10-22',
-    requisitioner: 'John Smith',
-    reviewer: '',
-    type: 'expense'
+    requesterId: 'john_smith',
+    financeId: '',
+    type: 'expense',
+    created_at: '2023-10-22T00:00:00Z',
+    updated_at: null,
+    is_approved: false,
+    receipt_path: null
   }
 ]
 
@@ -93,10 +105,10 @@ export const ledgerService = {
   /**
    * 取得單筆交易紀錄
    */
-  async getTransactionById(id: string | number): Promise<Transaction | null> {
+  async getTransactionById(id: string): Promise<Transaction | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const found = mockTransactions.find(t => String(t.id) === String(id))
+        const found = mockTransactions.find(t => t.id === id)
         resolve(found ? { ...found } : null)
       }, 200)
     })
@@ -121,10 +133,10 @@ export const ledgerService = {
   /**
    * 更新交易紀錄
    */
-  async updateTransaction(id: string | number, data: Partial<Transaction>): Promise<Transaction | null> {
+  async updateTransaction(id: string, data: Partial<Transaction>): Promise<Transaction | null> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const index = mockTransactions.findIndex(t => String(t.id) === String(id))
+        const index = mockTransactions.findIndex(t => t.id === id)
         if (index > -1) {
           mockTransactions[index] = { ...mockTransactions[index], ...data } as Transaction
           resolve({ ...mockTransactions[index] })
@@ -138,11 +150,11 @@ export const ledgerService = {
   /**
    * 刪除交易紀錄
    */
-  async deleteTransaction(id: string | number): Promise<boolean> {
+  async deleteTransaction(id: string): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const initialLength = mockTransactions.length
-        mockTransactions = mockTransactions.filter(t => String(t.id) !== String(id))
+        mockTransactions = mockTransactions.filter(t => t.id !== id)
         resolve(mockTransactions.length < initialLength)
       }, 300)
     })
