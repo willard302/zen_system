@@ -63,7 +63,7 @@ const handleSave = async () => {
 
 // 獲取大頭照 URL
 const getAvatarUrl = () => {
-  return userProfile.value?.avatar || 'public/images/default-avatar.png'
+  return userProfile.value?.avatar || 'public/images/default_avatar.png'
 }
 
 // 初始化時載入用戶資料

@@ -1,4 +1,5 @@
-import type { UserProfile, Activity } from '@/types'
+import type { UserProfile, Activity, Role } from '@/types'
+import type { Database } from '@/types/database.types'
 
 /**
  * 使用者相關的 API 服務，負責網路請求 (Data Layer)
@@ -9,17 +10,23 @@ export const userService = {
    */
   async fetchUserProfile(): Promise<UserProfile> {
     try {
-      const supabase = useSupabaseClient()
+      const supabase = useSupabaseClient<Database>()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) throw new Error('User not authenticated')
 
-      // 從 user metadata 獲取用戶資料
+      // 從 members 表讀取 club_role（授權來源），其餘欄位仍讀 user_metadata
+      const { data: memberData } = await supabase
+        .from('members')
+        .select('club_role, avatar_url')
+        .eq('id', user.id)
+        .single()
+
       const metadata = user.user_metadata || {}
 
-      // 獲取大頭照 URL
-      let avatarUrl: string | undefined = undefined
-      if (metadata.avatar_path) {
+      // 優先使用 members.avatar_url，fallback 至 Storage
+      let avatarUrl: string | undefined = memberData?.avatar_url || undefined
+      if (!avatarUrl && metadata.avatar_path) {
         const { data: avatarData } = supabase.storage
           .from('icc_avatar')
           .getPublicUrl(metadata.avatar_path)
@@ -28,7 +35,7 @@ export const userService = {
 
       return {
         name: metadata.name || user.email?.split('@')[0] || 'User',
-        role: metadata.role || 'Club Member',
+        role: (memberData?.club_role as Role) ?? 'Role.member',
         joinDate: metadata.join_date || 'Since 2024',
         totalMeditation: metadata.total_meditation || '0h',
         monthlyCheckIns: metadata.monthly_checkins || '0次',
@@ -44,7 +51,7 @@ export const userService = {
       // 返回默認資料
       return {
         name: 'User Name',
-        role: 'Club Member',
+        role: 'Role.member',
         joinDate: 'Since 2024',
         totalMeditation: '12.5h',
         monthlyCheckIns: '8次',

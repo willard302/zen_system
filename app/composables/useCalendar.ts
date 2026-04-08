@@ -1,5 +1,8 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Event } from '@/types'
+import type { Role } from '@/types/user'
+import { SENIOR_ROLES, EDITOR_ROLES } from '@/types/user'
+import type { Database } from '@/types/database.types'
 import {
   startOfMonth,
   endOfMonth,
@@ -20,10 +23,54 @@ import { eventService } from '@/services/eventService'
 export function useCalendar() {
   const isCalendarLoading = ref(false)
   const allEvents = ref<Event[]>([])
-  
+
   const today = ref(new Date())
   const currentDate = ref(new Date())
   const selectedDate = ref(today.value)
+
+  // -- 權限狀態 --
+
+  const currentUserId = ref<string | null>(null)
+  const currentRole = ref<Role | null>(null)
+
+  const loadCurrentUserRole = async () => {
+    const supabase = useSupabaseClient<Database>()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    currentUserId.value = user.id
+    const { data } = await supabase
+      .from('members')
+      .select('club_role')
+      .eq('id', user.id)
+      .single()
+    if (data) currentRole.value = data.club_role as Role
+  }
+
+  const canAddEvent = computed(() =>
+    currentRole.value !== null && EDITOR_ROLES.includes(currentRole.value)
+  )
+
+  const canEditEvent = (createdBy: string): boolean => {
+    if (!currentRole.value) return false
+    if (SENIOR_ROLES.includes(currentRole.value)) return true
+    return (
+      (currentRole.value === 'Role.vice_president' || currentRole.value === 'Role.team_director') &&
+      createdBy === currentUserId.value
+    )
+  }
+
+  const canDeleteEvent = (createdBy: string): boolean => canEditEvent(createdBy)
+
+  // -- Action Sheet 狀態 --
+
+  const actionSheetVisible = ref(false)
+
+  const openActionSheet = (date: Date) => {
+    selectedDate.value = date
+    if (eventsForSelectedDate.value.length > 0) {
+      actionSheetVisible.value = true
+    }
+  }
 
   // -- Computed Properties: 負責提供處理好的資料給 View --
   
@@ -51,7 +98,6 @@ export function useCalendar() {
 
   const previousMonth = () => {
     currentDate.value = sub(currentDate.value, { months: 1 })
-    // 未來可加入: 切換月份時向 eventService 索取新月份資料
   }
 
   const nextMonth = () => {
@@ -73,7 +119,7 @@ export function useCalendar() {
   })
   
   // -- 初始化與撈取資料 --
-  
+
   const loadEvents = async () => {
     isCalendarLoading.value = true
     try {
@@ -85,6 +131,9 @@ export function useCalendar() {
       isCalendarLoading.value = false
     }
   }
+
+  // 切換月份自動重新載入資料
+  watch(currentDate, () => loadEvents())
 
   return {
     today,
@@ -100,8 +149,14 @@ export function useCalendar() {
     nextMonth,
     eventsForSelectedDate,
     eventsInMonth,
-    format, // 直接讓 Controller 提供 format 方法給 View 使用，View 無需依賴 date-fns
+    format,
     loadEvents,
-    isCalendarLoading
+    loadCurrentUserRole,
+    isCalendarLoading,
+    canAddEvent,
+    canEditEvent,
+    canDeleteEvent,
+    actionSheetVisible,
+    openActionSheet,
   }
 }

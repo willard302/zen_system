@@ -1,31 +1,21 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 
-definePageMeta({
-  layout: 'default'
-})
+definePageMeta({ layout: 'default' })
 
-// 從 Controller 取得處理好的狀態與操作方法
 const {
-  selectedDate, 
-  monthYear, 
-  calendarGrid,
-  isToday, 
-  isSelected, 
-  isCurrentMonth,
-  selectDate, 
-  previousMonth, 
-  nextMonth,
-  eventsForSelectedDate, 
-  eventsInMonth,
-  format, 
-  loadEvents, 
-  isCalendarLoading
+  selectedDate, monthYear, calendarGrid,
+  isToday, isSelected, isCurrentMonth,
+  selectDate, previousMonth, nextMonth,
+  eventsForSelectedDate, eventsInMonth,
+  format, loadEvents, loadCurrentUserRole, isCalendarLoading,
+  canAddEvent, canEditEvent, canDeleteEvent,
+  actionSheetVisible, openActionSheet,
 } = useCalendar()
 
-// 載入初始資料
 onMounted(() => {
   loadEvents()
+  loadCurrentUserRole()
 })
 </script>
 
@@ -35,10 +25,7 @@ onMounted(() => {
     <AppHeader title="社團行事曆" bg-class="bg-soft-sky">
       <template #right-actions>
         <button class="flex items-center justify-center size-9 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
-          <span class="material-symbols-outlined text-white text-3xl">search</span>
-        </button>
-        <button class="flex items-center justify-center size-9 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
-          <span class="material-symbols-outlined text-white text-3xl">notifications</span>
+          <span class="material-symbols-outlined text-white text-3xl">menu</span>
         </button>
       </template>
     </AppHeader>
@@ -82,7 +69,7 @@ onMounted(() => {
             'text-white font-bold': isSelected(day) && isToday(day),
             'text-slate-900': isSelected(day) && !isToday(day)
           }"
-          @click="selectDate(day)"
+          @click="openActionSheet(day)"
         >
           <div 
             class="absolute inset-0 flex items-center justify-center"
@@ -101,48 +88,62 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- Events -->
-  <main class="flex-1 bg-white p-6 pb-24">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-lg font-bold text-slate-800">Events for {{ format(selectedDate, 'MMMM d') }}</h3>
-      <button class="flex items-center gap-1 text-sky-500 font-bold text-xs uppercase tracking-wider bg-sky-50 px-3 py-1.5 rounded-full hover:bg-sky-100 transition-colors">
-        <span class="material-symbols-outlined text-sm">add</span>
-        Add Event
-      </button>
-    </div>
-    <div v-if="eventsForSelectedDate.length > 0" class="space-y-5">
-      <div v-for="event in eventsForSelectedDate" :key="event.id" class="event-item pb-5 flex items-start gap-4">
+  <!-- Add Event FAB (permission-gated) -->
+  <teleport to="body">
+    <button
+      v-if="canAddEvent"
+      class="fixed bottom-24 right-5 z-30 flex items-center gap-1.5 bg-sky-500 text-white font-bold text-sm px-4 py-3 rounded-full shadow-lg shadow-sky-300 hover:bg-sky-600 active:scale-95 transition-all"
+    >
+      <span class="material-symbols-outlined text-lg">add</span>
+      新增活動
+    </button>
+  </teleport>
+
+  <!-- Events Action Sheet -->
+  <van-action-sheet
+    v-model:show="actionSheetVisible"
+    :title="format(selectedDate, 'yyyy 年 M 月 d 日')"
+    class="pb-safe"
+  >
+    <div class="px-4 pb-6 space-y-4 max-h-[60vh] overflow-y-auto">
+      <div
+        v-for="event in eventsForSelectedDate"
+        :key="event.id"
+        class="flex items-start gap-4 bg-sky-50/40 p-4 rounded-2xl border border-sky-100/50"
+      >
         <div class="min-w-[50px] text-center pt-1">
           <p class="text-sm font-bold text-slate-800">{{ event.time }}</p>
           <p class="text-[10px] text-slate-400 uppercase font-bold">{{ event.period }}</p>
         </div>
-        <div class="flex-1 bg-sky-50/40 p-4 rounded-2xl border border-sky-100/50">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="material-symbols-outlined text-sky-500 text-xl">{{ event.icon }}</span>
-            <p class="font-bold text-slate-800 text-sm">{{ event.title }}</p>
-          </div>
-          <p class="text-xs text-slate-500 mb-4 flex items-center gap-1">
+        <div class="flex-1">
+          <p class="font-bold text-slate-800 text-sm mb-1">{{ event.title }}</p>
+          <p class="text-xs text-slate-500 flex items-center gap-1 mb-2">
             <span class="material-symbols-outlined text-[14px]">location_on</span>
-            {{ event.location }}
+            {{ event.location || '未指定地點' }}
           </p>
+          <p v-if="event.description" class="text-xs text-slate-400 mb-2">{{ event.description }}</p>
           <div class="flex items-center justify-between">
-            <div class="flex -space-x-2">
-              <div v-for="i in Math.min(3, event.attendees)" :key="i" :style="{ background: `hsl(${200 + i * 30}, 70%, 70%)` }" class="size-7 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-bold">
-                {{ String.fromCharCode(64 + i) }}{{ String.fromCharCode(64 + i) }}
-              </div>
-              <div v-if="event.attendees > 3" class="size-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-400">
-                +{{ event.attendees - 3 }}
-              </div>
+            <span class="text-[10px] text-sky-600 font-bold bg-sky-100/50 px-2 py-1 rounded-md">
+              {{ event.attendees }} 人參與
+            </span>
+            <div class="flex gap-2" v-if="canEditEvent(event.createdBy)">
+              <button class="text-[10px] text-slate-500 flex items-center gap-0.5 hover:text-sky-500 transition-colors">
+                <span class="material-symbols-outlined text-sm">edit</span>
+                編輯
+              </button>
+              <button
+                v-if="canDeleteEvent(event.createdBy)"
+                class="text-[10px] text-slate-500 flex items-center gap-0.5 hover:text-red-500 transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+                刪除
+              </button>
             </div>
-            <span class="text-[10px] font-bold text-sky-600 bg-sky-100/50 px-2 py-1 rounded-md">Join Now</span>
           </div>
         </div>
       </div>
     </div>
-    <div v-else class="text-center py-10">
-      <p class="text-slate-500">No events for this day.</p>
-    </div>
-  </main>
+  </van-action-sheet>
 </template>
 
 <style scoped>
