@@ -30,8 +30,6 @@ export function useUser() {
         userService.fetchRecentActivities()
       ])
 
-      console.log('Fetched user profile:', profileData)
-
       userProfile.value = profileData
       recentActivities.value = activitiesData
     } catch (err: any) {

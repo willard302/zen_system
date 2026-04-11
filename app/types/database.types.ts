@@ -94,6 +94,42 @@ export type Database = {
         }
         Relationships: []
       }
+      meditation_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          started_at: string
+          duration_seconds: number
+          target_seconds: number
+          completed: boolean
+          meditation_type: string | null
+          note: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string
+          started_at: string
+          duration_seconds: number
+          target_seconds: number
+          completed?: boolean
+          meditation_type?: string | null
+          note?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          started_at?: string
+          duration_seconds?: number
+          target_seconds?: number
+          completed?: boolean
+          meditation_type?: string | null
+          note?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       ledger: {
         Row: {
           amount: number

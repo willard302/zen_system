@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { audioService } from '@/services/audioService'
+import { meditationService } from '@/services/meditationService'
 
 /**
  * Controller (邏輯層): 控制冥想計時器狀態，介接設備服務 (Web Audio) 與 View
@@ -8,6 +9,10 @@ export function useMeditationTimer() {
   const totalSeconds = ref(25 * 60 - 1)
   const isPlaying = ref(false)  // 原本預設是 true，此處修改建議預設狀態應在 UI掛載時判斷
   let timerInterval: ReturnType<typeof setInterval> | null = null
+
+  // Session tracking
+  const sessionStartedAt = ref<Date | null>(null)
+  const sessionTargetSeconds = ref<number>(0)
 
   const isEditing = ref(false)
   const editValue = ref('')
@@ -88,8 +93,32 @@ export function useMeditationTimer() {
     }
   }
 
+  const saveCurrentSession = async (completed: boolean) => {
+    if (!sessionStartedAt.value) return
+    const elapsed = sessionTargetSeconds.value - totalSeconds.value
+    if (elapsed < 60) return   // 不儲存不足 1 分鐘的記錄
+    try {
+      await meditationService.saveSession({
+        startedAt: sessionStartedAt.value,
+        durationSeconds: elapsed,
+        targetSeconds: sessionTargetSeconds.value,
+        completed,
+        meditationType: meditationType.value
+      })
+    } catch (err) {
+      console.error('Failed to save meditation session:', err)
+    }
+    sessionStartedAt.value = null
+    sessionTargetSeconds.value = 0
+  }
+
   const startTimer = () => {
     if (timerInterval) return
+    // 第一次啟動時記錄起始時間與目標秒數
+    if (!sessionStartedAt.value) {
+      sessionStartedAt.value = new Date()
+      sessionTargetSeconds.value = totalSeconds.value
+    }
     isPlaying.value = true
     timerInterval = setInterval(() => {
       if (totalSeconds.value > 0) {
@@ -98,6 +127,7 @@ export function useMeditationTimer() {
         pauseTimer()
         isPlaying.value = false
         triggerChime()
+        saveCurrentSession(true)
       }
     }, 1000)
   }
@@ -158,6 +188,10 @@ export function useMeditationTimer() {
   }
 
   const tearDownState = () => {
+    // 離頁前儲存尚未完成的會話（best-effort，不等待）
+    if (sessionStartedAt.value) {
+      saveCurrentSession(false)
+    }
     pauseTimer()
     if (customChimeUrl.value) {
       URL.revokeObjectURL(customChimeUrl.value)
