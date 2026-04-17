@@ -86,11 +86,7 @@ onBeforeUnmount(async () => {
         <span class="material-symbols-outlined text-sky-500">arrow_back</span>
       </button>
       <h1 class="text-lg font-bold tracking-tight text-slate-800">編輯個人資料</h1>
-      <div class="concentric-logo">
-        <div class="circle circle-1"></div>
-        <div class="circle circle-2"></div>
-        <div class="circle circle-3"></div>
-      </div>
+      <Zen-Logo size="sm" />
     </header>
 
     <main class="flex-1 w-full px-4 py-6 space-y-8">
@@ -249,7 +245,4 @@ onBeforeUnmount(async () => {
   position: absolute;
   border-radius: 50%;
 }
-.circle-1 { width: 100%; height: 100%; background-color: #EF4444; z-index: 1; }
-.circle-2 { width: 66.67%; height: 66.67%; background-color: #FBBF24; z-index: 2; }
-.circle-3 { width: 33.33%; height: 33.33%; background-color: #22C55E; z-index: 3; }
 </style>

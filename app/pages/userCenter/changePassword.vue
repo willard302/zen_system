@@ -7,6 +7,7 @@ import { useToast } from '@/composables/useToast'
 const router = useRouter()
 const { changePassword, isChangingPassword, error: userError } = useUser()
 const { success: showSuccessToast, error: showErrorToast } = useToast()
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'default',
@@ -58,11 +59,11 @@ const passwordStrength = computed<{ level: number; text: string; color: string }
   
   const levels = [
     { level: 0, text: '', color: '' },
-    { level: 1, text: '弱', color: 'text-red-400' },
-    { level: 2, text: '中', color: 'text-yellow-400' },
-    { level: 3, text: '強', color: 'text-green-400' },
-    { level: 4, text: '非常強', color: 'text-green-500' },
-    { level: 5, text: '極強', color: 'text-green-600' }
+    { level: 1, text: t('changePassword.weak'), color: 'text-red-400' },
+    { level: 2, text: t('changePassword.medium'), color: 'text-yellow-400' },
+    { level: 3, text: t('changePassword.strong'), color: 'text-green-400' },
+    { level: 4, text: t('changePassword.veryStrong'), color: 'text-green-500' },
+    { level: 5, text: t('changePassword.extremelyStrong'), color: 'text-green-600' }
   ]
   
   return levels[Math.min(strength, 5)]!
@@ -84,17 +85,17 @@ const handleSubmit = async () => {
   
   // 客戶端驗證
   if (!isFormValid.value) {
-    localError.value = '請填寫所有必填欄位'
+    localError.value = t('changePassword.errorEmpty')
     return
   }
 
   if (!passwordsMatch.value) {
-    localError.value = '新密碼和確認密碼不相符'
+    localError.value = t('changePassword.errorNoMatch')
     return
   }
 
   if (newPassword.value.length < 6) {
-    localError.value = '新密碼至少需要6個字符'
+    localError.value = t('changePassword.errorLength')
     return
   }
 
@@ -106,14 +107,14 @@ const handleSubmit = async () => {
     newPassword.value = ''
     confirmPassword.value = ''
     
-    showSuccessToast('密碼已成功修改')
+    showSuccessToast(t('changePassword.success'))
     
     // 2秒後返回上一頁
     setTimeout(() => {
       router.back()
     }, 1500)
   } catch (err: any) {
-    localError.value = err.message || '修改密碼失敗'
+    localError.value = err.message || t('changePassword.errorEmpty') // fallback
     showErrorToast(localError.value as string)
   }
 }
@@ -127,66 +128,49 @@ const handleInput = () => {
 </script>
 
 <template>
-  <div class="relative flex min-h-screen w-full flex-col bg-gradient-to-br from-blue-400 via-sky-300 to-cyan-200 overflow-x-hidden pb-16">
-    <!-- 背景圖片效果 -->
-    <div class="fixed inset-0 opacity-20 pointer-events-none">
-      <div class="absolute top-0 left-0 w-96 h-96 bg-white rounded-full filter blur-3xl opacity-30"></div>
-      <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl opacity-20"></div>
-    </div>
-
+  <div class="relative flex min-h-screen w-full flex-col bg-[#f0f9ff] overflow-x-hidden pb-16">
     <!-- Header -->
-    <header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-6 backdrop-blur-md bg-white/5">
-      <button 
-        @click="goBack"
-        class="w-12 h-12 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/30 shadow-lg transition-all duration-300 backdrop-blur-md"
-      >
-        <span class="material-symbols-outlined text-white text-2xl" data-icon="arrow_back">arrow_back</span>
+    <header class="flex items-center justify-between px-4 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-sky-500/10">
+      <button @click="goBack" class="flex items-center justify-center p-2 rounded-full hover:bg-sky-500/10 transition-colors">
+        <span class="material-symbols-outlined text-sky-500">arrow_back</span>
       </button>
-      <h1 class="text-white text-2xl font-extrabold tracking-widest font-headline drop-shadow-md">
-        變更密碼
-      </h1>
-      <div class="w-12"></div>
+      <h1 class="text-lg font-bold tracking-tight text-slate-800">{{ t('changePassword.title') }}</h1>
+      <Zen-Logo size="sm" />
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10 w-full max-w-md mx-auto flex flex-col items-center pt-24 px-6">
+    <main class="flex-1 w-full px-4 py-6 space-y-6">
       <!-- Error Message -->
       <div 
         v-if="localError"
-        class="w-full mb-6 p-4 rounded-lg bg-red-500/30 backdrop-blur-md border border-red-500/50 shadow-lg"
+        class="p-3 bg-red-100 text-red-700 rounded-xl text-sm border border-red-200 flex items-center gap-2"
       >
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-red-200 text-xl">error</span>
-          <p class="text-red-100 text-sm font-body">{{ localError }}</p>
-        </div>
+        <span class="material-symbols-outlined text-base">error</span>
+        {{ localError }}
       </div>
 
       <!-- Form Section -->
-      <div class="w-full space-y-6">
+      <div class="bg-white/60 backdrop-blur-sm p-6 rounded-3xl shadow-sm space-y-5 border border-white">
         <!-- Current Password Field -->
-        <div class="flex flex-col gap-2">
-          <label class="text-[12px] text-white/90 font-label tracking-widest uppercase ml-4">
-            當前密碼
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-slate-700 ml-1">
+            {{ t('changePassword.currentPassword') }}
           </label>
           <div class="relative flex items-center">
-            <span class="material-symbols-outlined absolute left-4 text-white/70">lock</span>
+            <span class="material-symbols-outlined absolute left-4 text-slate-400">lock</span>
             <input 
               v-model="currentPassword"
               @input="handleInput"
               :type="showCurrentPassword ? 'text' : 'password'"
-              class="w-full h-14 bg-white/10 border-none px-12 text-white placeholder:text-white/40 focus:ring-2 focus:ring-white/30 glass-panel transition-all outline-none"
-              style="border-radius: 9999px;"
-              placeholder="輸入當前密碼"
+              class="w-full h-12 pl-12 pr-12 rounded-2xl border-none bg-white/80 focus:ring-2 focus:ring-sky-500/50 shadow-sm placeholder:text-slate-400 text-slate-800"
+              :placeholder="t('changePassword.placeholderCurrent')"
             />
             <button
               type="button"
               @click="showCurrentPassword = !showCurrentPassword"
-              class="absolute right-4 p-2 hover:bg-white/10 rounded-lg transition-colors"
+              class="absolute right-4 p-2 hover:bg-sky-500/10 rounded-lg transition-colors"
             >
-              <span 
-                class="material-symbols-outlined text-white/70 text-xl"
-                :data-icon="showCurrentPassword ? 'visibility' : 'visibility_off'"
-              >
+              <span class="material-symbols-outlined text-slate-400 text-xl font-variation-settings-fill-0">
                 {{ showCurrentPassword ? 'visibility' : 'visibility_off' }}
               </span>
             </button>
@@ -194,37 +178,33 @@ const handleInput = () => {
         </div>
 
         <!-- New Password Field -->
-        <div class="flex flex-col gap-2">
-          <label class="text-[12px] text-white/90 font-label tracking-widest uppercase ml-4">
-            新密碼
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-slate-700 ml-1">
+            {{ t('changePassword.newPassword') }}
           </label>
           <div class="relative flex items-center">
-            <span class="material-symbols-outlined absolute left-4 text-white/70">lock</span>
+            <span class="material-symbols-outlined absolute left-4 text-slate-400">lock</span>
             <input 
               v-model="newPassword"
               @input="handleInput"
               :type="showNewPassword ? 'text' : 'password'"
-              class="w-full h-14 bg-white/10 border-none px-12 text-white placeholder:text-white/40 focus:ring-2 focus:ring-white/30 glass-panel transition-all outline-none"
-              style="border-radius: 9999px;"
-              placeholder="輸入新密碼"
+              class="w-full h-12 pl-12 pr-12 rounded-2xl border-none bg-white/80 focus:ring-2 focus:ring-sky-500/50 shadow-sm placeholder:text-slate-400 text-slate-800"
+              :placeholder="t('changePassword.placeholderNew')"
             />
             <button
               type="button"
               @click="showNewPassword = !showNewPassword"
-              class="absolute right-4 p-2 hover:bg-white/10 rounded-lg transition-colors"
+              class="absolute right-4 p-2 hover:bg-sky-500/10 rounded-lg transition-colors"
             >
-              <span 
-                class="material-symbols-outlined text-white/70 text-xl"
-                :data-icon="showNewPassword ? 'visibility' : 'visibility_off'"
-              >
+              <span class="material-symbols-outlined text-slate-400 text-xl font-variation-settings-fill-0">
                 {{ showNewPassword ? 'visibility' : 'visibility_off' }}
               </span>
             </button>
           </div>
           
           <!-- Password Strength Indicator -->
-          <div v-if="newPassword" class="ml-4 flex items-center gap-2">
-            <div class="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+          <div v-if="newPassword" class="ml-1 flex items-center gap-2">
+            <div class="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
               <div 
                 class="h-full transition-all duration-300 rounded-full"
                 :class="{
@@ -236,123 +216,108 @@ const handleInput = () => {
                 }"
               ></div>
             </div>
-            <span class="text-[12px] text-white/80 min-w-12" :class="passwordStrength.color">
+            <span class="text-[12px] font-bold min-w-12" :class="passwordStrength.color">
               {{ passwordStrength.text }}
             </span>
           </div>
         </div>
 
         <!-- Confirm Password Field -->
-        <div class="flex flex-col gap-2">
-          <label class="text-[12px] text-white/90 font-label tracking-widest uppercase ml-4">
-            確認新密碼
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-slate-700 ml-1">
+            {{ t('changePassword.confirmPassword') }}
           </label>
-          <div 
-            class="relative flex items-center"
-            :class="{
-              'ring-2 ring-red-400/50 rounded-full': !passwordsMatch && confirmPassword.length > 0
-            }"
-          >
-            <span class="material-symbols-outlined absolute left-4 text-white/70">lock_reset</span>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-4 text-slate-400">lock_reset</span>
             <input 
               v-model="confirmPassword"
               @input="handleInput"
               :type="showConfirmPassword ? 'text' : 'password'"
-              class="w-full h-14 bg-white/10 border-none px-12 text-white placeholder:text-white/40 focus:ring-2 focus:ring-white/30 glass-panel transition-all outline-none"
-              style="border-radius: 9999px;"
-              placeholder="確認新密碼"
+              class="w-full h-12 pl-12 pr-12 rounded-2xl border-none bg-white/80 focus:ring-2 focus:ring-sky-500/50 shadow-sm placeholder:text-slate-400 text-slate-800"
+              :class="{ 'ring-2 ring-red-400/50': !passwordsMatch && confirmPassword.length > 0 }"
+              :placeholder="t('changePassword.placeholderConfirm')"
             />
             <button
               type="button"
               @click="showConfirmPassword = !showConfirmPassword"
-              class="absolute right-4 p-2 hover:bg-white/10 rounded-lg transition-colors"
+              class="absolute right-4 p-2 hover:bg-sky-500/10 rounded-lg transition-colors"
             >
-              <span 
-                class="material-symbols-outlined text-white/70 text-xl"
-                :data-icon="showConfirmPassword ? 'visibility' : 'visibility_off'"
-              >
+              <span class="material-symbols-outlined text-slate-400 text-xl font-variation-settings-fill-0">
                 {{ showConfirmPassword ? 'visibility' : 'visibility_off' }}
               </span>
             </button>
           </div>
           
           <!-- Password Match Indicator -->
-          <div v-if="confirmPassword" class="ml-4 flex items-center gap-2">
+          <div v-if="confirmPassword" class="ml-1 flex items-center gap-2">
             <span 
-              v-if="!passwordsMatch"
-              class="material-symbols-outlined text-red-300 text-sm"
+              class="material-symbols-outlined text-sm"
+              :class="passwordsMatch ? 'text-green-500' : 'text-red-500'"
             >
-              close
+              {{ passwordsMatch ? 'check_circle' : 'cancel' }}
             </span>
             <span 
-              v-else
-              class="material-symbols-outlined text-green-300 text-sm"
+              class="text-[12px] font-bold"
+              :class="passwordsMatch ? 'text-green-600' : 'text-red-600'"
             >
-              check_circle
-            </span>
-            <span 
-              class="text-[12px]"
-              :class="passwordsMatch ? 'text-green-200' : 'text-red-300'"
-            >
-              {{ passwordsMatch ? '密碼相符' : '密碼不相符' }}
+              {{ passwordsMatch ? t('changePassword.match') : t('changePassword.noMatch') }}
             </span>
           </div>
         </div>
+      </div>
 
-        <!-- Submit Button -->
+      <!-- Submit Button -->
+      <div class="pt-4">
         <button
           @click="handleSubmit"
           :disabled="!isFormValid || isChangingPassword || !passwordsMatch"
-          class="w-full h-16 bg-primary text-white font-bold text-[18px] tracking-wide shadow-[0_0_20px_rgba(43,157,238,0.4)] hover:shadow-[0_0_30px_rgba(43,157,238,0.6)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none"
-          style="border-radius: 9999px;"
+          class="w-full h-14 bg-sky-500 text-white font-bold rounded-2xl shadow-lg shadow-sky-500/20 hover:bg-sky-500/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span 
             v-if="isChangingPassword"
-            class="material-symbols-outlined animate-spin"
-            data-icon="sync"
-          >
-            sync
-          </span>
-          {{ isChangingPassword ? '修改中...' : '確認修改' }}
+            class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+          ></span>
+          <span v-else class="material-symbols-outlined">save</span>
+          {{ isChangingPassword ? t('changePassword.submitting') : t('changePassword.submit') }}
         </button>
+      </div>
 
-        <!-- Password Requirements -->
-        <div class="mt-8 p-4 bg-white/10 backdrop-blur-md rounded-lg"]>
-          <p class="text-[12px] text-white/70 font-label tracking-widest uppercase mb-3">密碼要求</p>
-          <ul class="space-y-2">
-            <li class="flex items-center gap-2">
-              <span 
-                class="material-symbols-outlined text-sm"
-                :class="newPassword.length >= 6 ? 'text-green-300' : 'text-white/40'"
-              >
-                {{ newPassword.length >= 6 ? 'check_circle' : 'radio_button_unchecked' }}
-              </span>
-              <span class="text-[12px] text-white/70">至少6個字符</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span 
-                class="material-symbols-outlined text-sm"
-                :class="/[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) ? 'text-green-300' : 'text-white/40'"
-              >
-                {{ /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) ? 'check_circle' : 'radio_button_unchecked' }}
-              </span>
-              <span class="text-[12px] text-white/70">包含大小寫字母</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span 
-                class="material-symbols-outlined text-sm"
-                :class="/\d/.test(newPassword) ? 'text-green-300' : 'text-white/40'"
-              >
-                {{ /\d/.test(newPassword) ? 'check_circle' : 'radio_button_unchecked' }}
-              </span>
-              <span class="text-[12px] text-white/70">包含數字</span>
-            </li>
-          </ul>
-        </div>
+      <!-- Password Requirements -->
+      <div class="bg-white/40 p-5 rounded-2xl border border-white">
+        <p class="text-[12px] text-slate-500 font-bold uppercase tracking-wider mb-3">{{ t('changePassword.requirements') }}</p>
+        <ul class="space-y-2">
+          <li class="flex items-center gap-3">
+            <span 
+              class="material-symbols-outlined text-base"
+              :class="newPassword.length >= 6 ? 'text-green-500' : 'text-slate-300'"
+            >
+              {{ newPassword.length >= 6 ? 'check_circle' : 'circle' }}
+            </span>
+            <span class="text-sm font-medium" :class="newPassword.length >= 6 ? 'text-slate-800' : 'text-slate-500'">{{ t('changePassword.reqLength') }}</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span 
+              class="material-symbols-outlined text-base"
+              :class="/[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) ? 'text-green-500' : 'text-slate-300'"
+            >
+              {{ /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) ? 'check_circle' : 'circle' }}
+            </span>
+            <span class="text-sm font-medium" :class="/[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) ? 'text-slate-800' : 'text-slate-500'">{{ t('changePassword.reqCase') }}</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span 
+              class="material-symbols-outlined text-base"
+              :class="/\d/.test(newPassword) ? 'text-green-500' : 'text-slate-300'"
+            >
+              {{ /\d/.test(newPassword) ? 'check_circle' : 'circle' }}
+            </span>
+            <span class="text-sm font-medium" :class="/\d/.test(newPassword) ? 'text-slate-800' : 'text-slate-500'">{{ t('changePassword.reqNumber') }}</span>
+          </li>
+        </ul>
       </div>
 
       <!-- Footer Text -->
-      <p class="mt-12 text-white/60 text-sm font-label tracking-widest uppercase">
+      <p class="text-center text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] pt-8">
         TKU Zen Club • 淡江大學禪學社
       </p>
     </main>
@@ -360,19 +325,8 @@ const handleInput = () => {
 </template>
 
 <style scoped>
-.glass-well {
-  backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.glass-panel {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+.font-variation-settings-fill-0 {
+  font-variation-settings: "FILL" 0;
 }
 
 @keyframes spin {
