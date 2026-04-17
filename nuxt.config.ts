@@ -30,8 +30,17 @@ export default defineNuxtConfig({
     autoImport: true
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@vant/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@vant/nuxt', '@nuxtjs/i18n'],
 
+  i18n: {
+    locales: [
+      { code: 'zh-TW', name: '繁體中文', file: 'zh-TW.json' },
+      { code: 'en', name: 'English', file: 'en.json' }
+    ],
+    langDir: 'locales/',
+    defaultLocale: 'zh-TW',
+    strategy: 'no_prefix'
+  },
   supabase: {
     redirectOptions: {
       login: '/auth/login',

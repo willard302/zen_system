@@ -1,0 +1,22 @@
+{
+  "welcome": "Welcome",
+  "language": "Language",
+  "accountSettings": "Account Settings",
+  "editProfile": "Edit Profile",
+  "changePassword": "Change Password",
+  "privacySettings": "Privacy Settings",
+  "logout": "Logout",
+  "totalMeditation": "Total Meditation",
+  "monthlyCheckIns": "Monthly Check-ins",
+  "department": "Department",
+  "studentId": "Student ID",
+  "profile": "Profile",
+  "member": "Member",
+  "loading": "Loading...",
+  "tabbar": {
+    "home": "Home",
+    "ledger": "Ledger",
+    "meditation": "Meditation",
+    "calendar": "Calendar"
+  }
+}

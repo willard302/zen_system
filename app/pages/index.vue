@@ -5,6 +5,12 @@ definePageMeta({
   layout: 'default'
 })
 
+const { t, locale, setLocale } = useI18n()
+
+const toggleLanguage = () => {
+  setLocale(locale.value === 'zh-TW' ? 'en' : 'zh-TW')
+}
+
 // 使用 useUser composable
 const {
   userProfile,
@@ -58,21 +64,21 @@ const getAvatarUrl = () => {
 }
 
 // 統計數據
-const stats: StatCard[] = [
-  { icon: 'avg_time', label: '總禪定時數', value: userProfile.value?.totalMeditation || '0h' },
-  { icon: 'calendar_month', label: '本月打卡', value: userProfile.value?.monthlyCheckIns || '0次' }
-]
+const stats = computed<StatCard[]>(() => [
+  { icon: 'avg_time', label: t('totalMeditation'), value: userProfile.value?.totalMeditation || '0h' },
+  { icon: 'calendar_month', label: t('monthlyCheckIns'), value: userProfile.value?.monthlyCheckIns || '0次' }
+])
 
-const menuItems: MenuItem[] = [
-  { icon: 'person_edit', label: '編輯個人資料', path: '/userCenter/userInfo' },
-  { icon: 'lock_reset', label: '修改密碼', path: '/userCenter/changePassword' },
-  { icon: 'security', label: '隱私權設定' }
-]
+const menuItems = computed<MenuItem[]>(() => [
+  { icon: 'person_edit', label: t('editProfile'), path: '/userCenter/userInfo' },
+  { icon: 'lock_reset', label: t('changePassword'), path: '/userCenter/changePassword' },
+  { icon: 'security', label: t('privacySettings') }
+])
 </script>
 
 <template>
   <!-- Header Section -->
-  <AppHeader title="個人資料" bg-class="sky-gradient" :has-padding="true"></AppHeader>
+  <AppHeader :title="t('profile')" bg-class="sky-gradient" :has-padding="true"></AppHeader>
 
     <!-- Main Content -->
     <main class="flex-1 -mt-4 px-4 pb-24 relative z-40">
@@ -114,23 +120,23 @@ const menuItems: MenuItem[] = [
 
         <div class="mb-4">
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
-            {{ userProfile?.name || '載入中...' }}
+            {{ userProfile?.name || t('loading') }}
           </h2>
           <div class="flex items-center justify-center gap-2 mt-2 flex-wrap">
             <span class="text-sm font-semibold px-3 py-1 rounded-full border bg-primary/10 text-primary border-primary/20">
-              {{ userProfile?.role || '會員' }}
+              {{ userProfile?.role || t('member') }}
             </span>
           </div>
         </div>
 
         <div class="w-full grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-700 pt-4">
           <div class="text-left">
-            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">學系</p>
-            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile?.department || '載入中...' }}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('department') }}</p>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile?.department || t('loading') }}</p>
           </div>
           <div class="text-right">
-            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">學號</p>
-            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile?.studentId || '載入中...' }}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ t('studentId') }}</p>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">{{ userProfile?.studentId || t('loading') }}</p>
           </div>
         </div>
       </div>
@@ -150,14 +156,23 @@ const menuItems: MenuItem[] = [
 
       <!-- Action Items List -->
       <div class="space-y-3 mb-8">
-        <h3 class="px-2 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">帳戶設定</h3>
+        <h3 class="px-2 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{ t('accountSettings') }}</h3>
         <div class="bg-white/80 dark:bg-slate-800/80 rounded-2xl overflow-hidden shadow-sm">
+          <div
+            class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors border-b border-slate-50 dark:border-slate-700 cursor-pointer"
+            @click="toggleLanguage"
+          >
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-slate-400">language</span>
+              <span class="font-medium">{{ t('language') }} ({{ locale === 'zh-TW' ? '繁體中文' : 'English' }})</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-300">swap_horiz</span>
+          </div>
           <NuxtLink
             v-for="(item, index) in menuItems"
             :key="item.label"
             :to="item.path || '#'"
-            class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors"
-            :class="{ 'border-b border-slate-50 dark:border-slate-700': index < menuItems.length - 1 }"
+            class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors border-b border-slate-50 dark:border-slate-700"
           >
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-slate-400">{{ item.icon }}</span>
@@ -171,7 +186,7 @@ const menuItems: MenuItem[] = [
           >
             <div class="flex items-center gap-3 text-red-500">
               <span class="material-symbols-outlined">logout</span>
-              <span class="font-bold">登出</span>
+              <span class="font-bold">{{ t('logout') }}</span>
             </div>
           </a>
         </div>
