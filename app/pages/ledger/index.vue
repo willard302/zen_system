@@ -20,11 +20,13 @@ const {
 onMounted(() => {
   loadLedgerData()
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
   <!-- Header -->
-  <AppHeader title="社團帳務" bg-class="bg-sky-400">
+  <AppHeader :title="t('ledger.title')" bg-class="bg-sky-400">
     <template #right-actions>
       <button class="p-2 text-white hover:bg-white/20 rounded-lg transition-colors">
         <span class="material-symbols-outlined text-3xl">menu</span>
@@ -38,14 +40,14 @@ onMounted(() => {
         <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
         <div class="relative z-10 flex flex-col items-center">
-          <p class="text-white/80 text-xs font-bold uppercase tracking-[0.2em] mb-2">Club Treasury Balance</p>
+          <p class="text-white/80 text-xs font-bold uppercase tracking-[0.2em] mb-2">{{ t('ledger.treasuryBalance') }}</p>
           <h1 class="text-5xl font-bold tracking-tight text-white mb-6">{{ clubBalance }}</h1>
           <div class="flex gap-4 w-full">
             <NuxtLink to="/ledger/new" class="flex-1 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all border border-white/30 inline-flex">
-              <span class="material-symbols-outlined text-lg">add_circle</span> New Entry
+              <span class="material-symbols-outlined text-lg">add_circle</span> {{ t('ledger.newEntry') }}
             </NuxtLink>
             <button class="flex-1 bg-white text-sky-500 py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 hover:shadow-lg">
-              <span class="material-symbols-outlined text-lg">ios_share</span> Report
+              <span class="material-symbols-outlined text-lg">ios_share</span> {{ t('ledger.report') }}
             </button>
           </div>
         </div>
@@ -59,7 +61,7 @@ onMounted(() => {
           <span class="material-symbols-outlined">trending_up</span>
         </div>
         <div>
-          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Month In</p>
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">{{ t('ledger.monthIn') }}</p>
           <p class="font-bold text-slate-800 text-base">{{ monthIn }}</p>
         </div>
       </div>
@@ -68,7 +70,7 @@ onMounted(() => {
           <span class="material-symbols-outlined">trending_down</span>
         </div>
         <div>
-          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Month Out</p>
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">{{ t('ledger.monthOut') }}</p>
           <p class="font-bold text-slate-800 text-base">{{ monthOut }}</p>
         </div>
       </div>
@@ -77,8 +79,8 @@ onMounted(() => {
     <!-- Transaction History -->
     <main class="flex-1 px-6 pb-32">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-bold text-slate-800">Transaction History</h3>
-        <button class="text-sky-500 text-sm font-semibold hover:text-sky-600 transition-colors">View All</button>
+        <h3 class="text-lg font-bold text-slate-800">{{ t('ledger.transactionHistory') }}</h3>
+        <button class="text-sky-500 text-sm font-semibold hover:text-sky-600 transition-colors">{{ t('ledger.viewAll') }}</button>
       </div>
       <div class="space-y-0">
         <NuxtLink
@@ -107,7 +109,7 @@ onMounted(() => {
               'inline-block px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider',
               getStatusColor(transaction.status)
             ]">
-              {{ transaction.status }}
+              {{ t('ledger.status' + transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)) }}
             </span>
           </div>
         </NuxtLink>
