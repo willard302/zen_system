@@ -1,6 +1,6 @@
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { format, parseISO, addHours, set } from 'date-fns'
-import type { CreateEventPayload } from '@/types'
+import type { CreateEventPayload, Event } from '@/types'
 import { eventService } from '@/services/eventService'
 
 export const COLOR_OPTIONS = [
@@ -21,6 +21,12 @@ export function useCalendarEditor() {
   const { addToast } = useToast()
 
   const isSaving = ref(false)
+  const isInitializing = ref(false)
+  const editingEventId = computed(() => {
+    const queryId = route.query.id
+    return typeof queryId === 'string' && queryId.length > 0 ? queryId : null
+  })
+  const isEditMode = computed(() => editingEventId.value !== null)
 
   const formData = ref({
     title: '',
@@ -50,6 +56,40 @@ export function useCalendarEditor() {
     formData.value.endTime = format(end, 'HH:mm')
     savedStartTime = formData.value.startTime
     savedEndTime = formData.value.endTime
+  }
+
+  const fillFormFromEvent = (event: Event) => {
+    formData.value.title = event.title || ''
+    formData.value.description = event.description || ''
+    formData.value.location = event.location || ''
+    formData.value.startDate = format(event.startAt, 'yyyy-MM-dd')
+    formData.value.startTime = format(event.startAt, 'HH:mm')
+    formData.value.endDate = format(event.endAt, 'yyyy-MM-dd')
+    formData.value.endTime = format(event.endAt, 'HH:mm')
+    formData.value.allDay = event.allDay
+    formData.value.color = event.color || COLOR_OPTIONS[0]
+    formData.value.recurrence = event.recurrence || 'none'
+    savedStartTime = formData.value.startTime
+    savedEndTime = formData.value.endTime
+  }
+
+  const initEditor = async () => {
+    isInitializing.value = true
+    try {
+      if (editingEventId.value) {
+        const event = await eventService.fetchEventById(editingEventId.value)
+        fillFormFromEvent(event)
+        return
+      }
+
+      const queryDate = route.query.date
+      initForm(typeof queryDate === 'string' ? queryDate : undefined)
+    } catch (err: any) {
+      addToast(err.message || '載入活動失敗', 'error')
+      router.replace('/calendar')
+    } finally {
+      isInitializing.value = false
+    }
   }
 
   // 全天活動 toggle
@@ -105,8 +145,14 @@ export function useCalendarEditor() {
         recurrence: formData.value.recurrence,
       }
 
-      await eventService.createEvent(payload)
-      addToast('活動已新增', 'success')
+      if (editingEventId.value) {
+        await eventService.updateEvent(editingEventId.value, payload)
+        addToast('活動已更新', 'success')
+      } else {
+        await eventService.createEvent(payload)
+        addToast('活動已新增', 'success')
+      }
+
       router.push('/calendar')
     } catch (err: any) {
       addToast(err.message || '儲存失敗', 'error')
@@ -125,16 +171,15 @@ export function useCalendarEditor() {
     return timeStr || ''
   }
 
-  // 初始化：若 query 帶有 date 參數則使用
-  const queryDate = route.query.date as string | undefined
-  initForm(queryDate)
-
   return {
     formData,
     isSaving,
+    isInitializing,
+    isEditMode,
     COLOR_OPTIONS,
     RECURRENCE_OPTIONS,
     initForm,
+    initEditor,
     validateForm,
     saveEvent,
     formatDisplayDate,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { StatCard, MenuItem } from '@/types'
+import type { StatCard, MenuItem } from '@/types';
 
 definePageMeta({
   layout: 'default'

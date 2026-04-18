@@ -9,10 +9,17 @@ const router = useRouter()
 const {
   formData,
   isSaving,
+  isInitializing,
+  isEditMode,
+  initEditor,
   saveEvent,
   formatDisplayDate,
   formatDisplayTime,
 } = useCalendarEditor()
+
+onMounted(() => {
+  initEditor()
+})
 
 // Popup 狀態
 const showStartDatePicker = ref(false)
@@ -61,19 +68,19 @@ const getTimeColumns = (timeStr: string) => {
         <button @click="router.back()" class="material-symbols-outlined text-[#2b9dee] text-2xl active:opacity-70 active:scale-95 transition-all">
           arrow_back
         </button>
-        <h1 class="text-lg font-bold tracking-widest text-[#2b9dee]">新增活動</h1>
+        <h1 class="text-lg font-bold tracking-widest text-[#2b9dee]">{{ isEditMode ? '編輯活動' : '新增活動' }}</h1>
       </div>
       <button
         @click="saveEvent"
-        :disabled="isSaving"
+        :disabled="isSaving || isInitializing"
         class="text-[#2b9dee] text-sm font-bold tracking-widest active:opacity-70 active:scale-95 transition-all disabled:opacity-40"
       >
-        {{ isSaving ? '儲存中…' : '儲存' }}
+        {{ isSaving ? '儲存中…' : (isEditMode ? '更新' : '儲存') }}
       </button>
     </header>
 
     <!-- Content -->
-    <main class="px-4 pt-4 pb-24 space-y-5 max-w-md mx-auto">
+    <main v-if="!isInitializing" class="px-4 pt-4 pb-24 space-y-5 max-w-md mx-auto">
 
       <!-- Hero Banner -->
       <div class="relative h-32 w-full rounded-2xl overflow-hidden shadow-sm">
@@ -228,6 +235,13 @@ const getTimeColumns = (timeStr: string) => {
           </button>
         </div>
       </section>
+    </main>
+
+    <main v-else class="px-4 pt-16 pb-24 max-w-md mx-auto">
+      <div class="glass-card rounded-2xl p-8 text-center text-slate-500">
+        <span class="material-symbols-outlined text-3xl block mb-2 animate-spin opacity-50">progress_activity</span>
+        載入活動中…
+      </div>
     </main>
 
     <!-- Date/Time Pickers -->

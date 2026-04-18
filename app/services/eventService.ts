@@ -16,6 +16,7 @@ function mapToEvent(row: EventRow): Event {
     endAt: parseISO(row.end_at),
     allDay: row.all_day,
     color: row.color,
+    recurrence: row.recurrence,
     createdBy: row.created_by,
     attendees: row.participants?.length ?? 0,
     date: startAt,
@@ -105,4 +106,17 @@ export const eventService = {
     const { error } = await supabase.from('events').delete().eq('id', id)
     if (error) throw error
   },
+
+  // 額外功能：根據 ID 取得單一活動詳情
+  async fetchEventById(id: string): Promise<Event> {
+    const supabase = useSupabaseClient<Database>()
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', id)
+      .single()
+  
+    if (error) throw error
+    return mapToEvent(data)
+  }
 }

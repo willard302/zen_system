@@ -1,14 +1,34 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { format as fnsFormat } from 'date-fns'
+import { eventService } from '@/services/eventService'
 
 definePageMeta({ layout: 'default' })
 
 const router = useRouter()
 const menuVisible = ref(false)
+const { addToast } = useToast()
 
 const navigateToEditor = () => {
   router.push({ path: '/calendar/editor', query: { date: fnsFormat(selectedDate.value, 'yyyy-MM-dd') } })
+}
+
+const navigateToEditEvent = (eventId: string) => {
+  router.push({ path: '/calendar/editor', query: { id: eventId } })
+}
+
+const handleDeleteEvent = async (eventId: string) => {
+  if (!window.confirm('確定要刪除此活動嗎？')) {
+    return
+  }
+
+  try {
+    await eventService.deleteEvent(eventId)
+    addToast('活動已刪除', 'success')
+    await loadEvents()
+  } catch (err: any) {
+    addToast(err.message || '刪除失敗', 'error')
+  }
 }
 
 const {
@@ -142,12 +162,16 @@ onMounted(() => {
               {{ event.attendees }} 人參與
             </span>
             <div class="flex gap-2" v-if="canEditEvent(event.createdBy)">
-              <button class="text-[10px] text-slate-500 flex items-center gap-0.5 hover:text-sky-500 transition-colors">
+              <button
+                @click="navigateToEditEvent(event.id)"
+                class="text-[10px] text-slate-500 flex items-center gap-0.5 hover:text-sky-500 transition-colors"
+              >
                 <span class="material-symbols-outlined text-sm">edit</span>
                 編輯
               </button>
               <button
                 v-if="canDeleteEvent(event.createdBy)"
+                @click="handleDeleteEvent(event.id)"
                 class="text-[10px] text-slate-500 flex items-center gap-0.5 hover:text-red-500 transition-colors"
               >
                 <span class="material-symbols-outlined text-sm">delete</span>

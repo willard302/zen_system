@@ -7,6 +7,7 @@ export interface Event {
   endAt: Date
   allDay: boolean
   color: string
+  recurrence: 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'
   createdBy: string
   attendees: number
   // Derived display fields
