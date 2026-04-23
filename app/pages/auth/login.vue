@@ -47,26 +47,11 @@ const handleGoogleLogin = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth/confirm`
+      redirectTo: 'https://vvbtzvedcvhxibozbryz.supabase.co/auth/v1/callback'
     }
   })
 
   if (error) errorMessage.value = error.message
-
-  // try {
-  //   // 呼叫伺服器端 API 取得 Google 授權 URL
-  //   const response = await $fetch<{ url: string }>('/api/auth/google')
-    
-  //   if (response?.url) {
-  //     // 重定向到 Google 授權頁面
-  //     window.location.href = response.url
-  //   } else {
-  //     errorMessage.value = 'Failed to initialize Google login'
-  //   }
-  // } catch (error: any) {
-  //   errorMessage.value = error.data?.message || 'Google login setup failed'
-  //   console.error('Google login error:', error)
-  // }
 }
 </script>
 

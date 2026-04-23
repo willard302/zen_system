@@ -49,12 +49,4 @@ export default defineNuxtConfig({
     },
     types: '~/types/database.types.ts'
   },
-
-  runtimeConfig: {
-    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    public: {
-      googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-      googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || ''
-    }
-  }
 })
