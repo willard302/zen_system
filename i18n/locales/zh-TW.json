@@ -74,13 +74,17 @@
     "saveRecord": "儲存紀錄",
     "deleteRecord": "刪除此筆紀錄",
     "totalBalance": "總餘額概覽",
+    "monthlyIncome": "本月總收入",
+    "monthlyExpenses": "本月總支出",
     "fromLastMonth": "較上月",
     "monthlyTrend": "收支趨勢",
     "trendDescription": "最近六個月收支對比",
     "expenseBreakdown": "支出比例",
     "topCategories": "主要支出類別",
     "currentMonth": "本月統計中",
-    "calculatedTotal": "累計總額"
+    "calculatedTotal": "累計總額",
+    "in": "收入",
+    "out": "支出"
   },
   "meditation": {
     "stats": "冥想統計",

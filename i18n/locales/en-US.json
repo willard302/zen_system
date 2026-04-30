@@ -74,13 +74,17 @@
     "saveRecord": "Save Record",
     "deleteRecord": "Delete Record",
     "totalBalance": "Total Balance Overview",
+    "monthlyIncome": "Monthly Total Income",
+    "monthlyExpenses": "Monthly Total Expenses",
     "fromLastMonth": "from last month",
     "monthlyTrend": "Monthly Trend",
     "trendDescription": "Income vs Expenses (Last 6 Months)",
     "expenseBreakdown": "Expense Breakdown",
     "topCategories": "Top Categories",
     "currentMonth": "Current Month",
-    "calculatedTotal": "Calculated Total"
+    "calculatedTotal": "Calculated Total",
+    "in": "Income",
+    "out": "Expense"
   },
   "meditation": {
     "stats": "Meditation Stats",
