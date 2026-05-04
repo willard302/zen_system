@@ -13,10 +13,6 @@ const handleSendCode = () => {
   // TODO: Implement send verification code logic
   console.log('Sending verification code to', email.value)
 }
-
-const goBack = () => {
-  router.back()
-}
 </script>
 
 <template>
@@ -28,7 +24,7 @@ const goBack = () => {
     <div class="relative z-10 flex flex-col items-center w-full h-full">
       <!-- Top Navigation -->
       <nav class="absolute top-0 left-0 w-full flex items-center justify-center px-6 py-6" style="margin-top: env(safe-area-inset-top);">
-        <button @click="goBack" aria-label="Go back" class="absolute left-6 flex size-12 items-center justify-center rounded-full bg-white/90 shadow-lg active:scale-95 transition-transform z-10">
+        <button @click="router.back" aria-label="Go back" class="absolute left-6 flex size-12 items-center justify-center rounded-full bg-white/90 shadow-lg active:scale-95 transition-transform z-10">
           <span class="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
         <h1 class="text-[26px] font-extrabold tracking-widest text-white drop-shadow-md">

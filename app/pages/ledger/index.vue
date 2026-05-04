@@ -5,6 +5,8 @@ definePageMeta({
   layout: 'default'
 })
 
+const router = useRouter()
+
 // 從 Controller 取得處理好的狀態與操作方法
 const {
   clubBalance,
@@ -22,16 +24,11 @@ onMounted(() => {
 })
 
 const { t } = useI18n()
-
-const goBack = () => {
-  const router = useRouter()
-  router.back()
-}
 </script>
 
 <template>
   <!-- Header -->
-  <AppPageHeader :title="t('ledger.title')" @back="goBack">
+  <AppPageHeader :title="t('ledger.title')" @back="router.back">
     <template #right-actions>
       <button class="p-2 text-white hover:bg-white/20 rounded-lg transition-colors">
         <span class="material-symbols-outlined text-3xl">menu</span>

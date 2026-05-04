@@ -62,7 +62,7 @@ onMounted(async () => {
 })
 
 const goBack = () => {
-  router.push('/ledger')
+  router.back()
 }
 
 const handleSave = async () => {

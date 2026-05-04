@@ -18,10 +18,6 @@ const { formData, isLoading, isSaving, error, success, updateUserInfo } = useUse
 // 使用 Toast
 const { success: showSuccessToast, error: showErrorToast } = useToast()
 
-const goBack = () => {
-  router.back()
-}
-
 // 處理大頭照點擊
 const avatarInput = ref<HTMLInputElement | null>(null)
 const handleAvatarClick = () => {
@@ -83,7 +79,7 @@ onBeforeUnmount(async () => {
 <template>
   <div class="relative flex min-h-screen w-full flex-col bg-[#f0f9ff] overflow-x-hidden pb-16">
     <!-- Header -->
-    <AppPageHeader :title="t('userInfo.title')" @back="goBack" />
+    <AppPageHeader :title="t('userInfo.title')" @back="router.back" />
 
     <main class="flex-1 w-full px-4 py-6 space-y-8">
       <!-- Profile Picture Section -->

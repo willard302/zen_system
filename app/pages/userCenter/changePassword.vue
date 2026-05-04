@@ -69,11 +69,6 @@ const passwordStrength = computed<{ level: number; text: string; color: string }
   return levels[Math.min(strength, 5)]!
 })
 
-// 處理返回
-const goBack = () => {
-  router.back()
-}
-
 // 清除所有錯誤
 const clearErrors = () => {
   localError.value = null
@@ -130,7 +125,7 @@ const handleInput = () => {
 <template>
   <div class="relative flex min-h-screen w-full flex-col bg-[#f0f9ff] overflow-x-hidden pb-16">
     <!-- Header -->
-    <AppPageHeader :title="t('changePassword.title')" @back="goBack" />
+    <AppPageHeader :title="t('changePassword.title')" @back="router.back" />
 
     <!-- Main Content -->
     <main class="flex-1 w-full px-4 py-6 space-y-6">

@@ -47,13 +47,12 @@ const formatDuration = (seconds: number) => {
   return `${Math.floor(m / 60)}h ${m % 60}m`
 }
 
-const goBack = () => router.back()
 </script>
 
 <template>
   <div class="relative flex h-full min-h-screen w-full flex-col sky-gradient overflow-x-hidden pb-24">
     <!-- Header -->
-    <AppPageHeader :title="t('meditation.stats')" @back="goBack" />
+    <AppPageHeader :title="t('meditation.stats')" @back="router.back" />
 
     <!-- Main Content -->
     <main class="flex flex-col gap-6 p-4">

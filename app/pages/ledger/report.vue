@@ -10,10 +10,6 @@ onMounted(() => {
   loadReportData()
 })
 
-const goBack = () => {
-  router.back()
-}
-
 const router = useRouter()
 </script>
 
@@ -25,7 +21,7 @@ const router = useRouter()
     </div>
 
     <!-- TopAppBar -->
-    <AppPageHeader :title="$t('ledger.report')" @back="goBack" />
+    <AppPageHeader :title="$t('ledger.report')" @back="router.back" />
 
     <main v-if="reportData" class="relative z-10 px-6 pt-8 space-y-8">
       <!-- Summary Bento Grid -->
