@@ -41,9 +41,16 @@
   },
   "tabbar": {
     "home": "Home",
+    "messaging": "Messages",
     "ledger": "Ledger",
     "meditation": "Meditation",
     "calendar": "Calendar"
+  },
+  "messaging": {
+    "title": "Messages",
+    "searchPlaceholder": "Search conversations or members...",
+    "noResults": "No conversations found",
+    "inputPlaceholder": "Type a message..."
   },
   "ledger": {
     "title": "Club Ledger",

@@ -41,9 +41,16 @@
   },
   "tabbar": {
     "home": "首頁",
+    "messaging": "訊息",
     "ledger": "記帳",
     "meditation": "禪定",
     "calendar": "行事曆"
+  },
+  "messaging": {
+    "title": "訊息",
+    "searchPlaceholder": "搜尋對話或成員...",
+    "noResults": "找不到相關對話",
+    "inputPlaceholder": "輸入訊息..."
   },
   "ledger": {
     "title": "社團帳務",

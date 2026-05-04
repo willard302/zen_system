@@ -1,4 +1,5 @@
 export * from './meditation'
+export * from './messaging'
 
 /**
  * Tabbar Items

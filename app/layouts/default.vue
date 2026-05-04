@@ -19,6 +19,10 @@ const showTabbar = computed(() => {
   if (path.startsWith('/ledger/') && path !== '/ledger') {
     return false
   }
+  // 隱藏 messaging 子頁面（對話室）
+  if (path.startsWith('/messaging/') && path !== '/messaging') {
+    return false
+  }
   return true
 })
 </script>

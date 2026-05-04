@@ -38,7 +38,7 @@ onUnmounted(() => {
 
 <template>
   <!-- Header -->
-  <AppHeader title="禪定時間" bg-class="bg-soft-sky">
+  <AppHeader title="禪定時間">
     <template #right-actions>
       <button @click="showDropdown = !showDropdown" class="p-2 text-white hover:bg-white/20 rounded-lg transition-colors">
         <span class="material-symbols-outlined text-white text-3xl">menu</span>
