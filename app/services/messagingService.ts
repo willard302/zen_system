@@ -79,9 +79,8 @@ export const messagingService = {
     const senderNames = new Map<string, string>()
     if (senderIds.length) {
       const { data: profiles } = await supabase
-        .from('members')
-        .select('id, name')
-        .in('id', senderIds)
+        .rpc('get_user_profiles', { user_ids: senderIds })
+
       for (const p of (profiles ?? [])) {
         senderNames.set(p.id, p.name ?? p.id)
       }
@@ -147,9 +146,7 @@ export const messagingService = {
     const senderMap = new Map<string, { name: string; avatar: string | null }>()
     if (senderIds.length) {
       const { data: profiles } = await supabase
-        .from('members')
-        .select('id, name, avatar_url')
-        .in('id', senderIds)
+        .rpc('get_user_profiles', { user_ids: senderIds })
       for (const p of (profiles ?? [])) {
         senderMap.set(p.id, { name: p.name ?? p.id, avatar: p.avatar_url ?? null })
       }

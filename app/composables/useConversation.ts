@@ -8,7 +8,6 @@ import type { Database } from '@/types/database.types'
  */
 export function useConversation(conversationId: string) {
   const supabase = useSupabaseClient<Database>()
-
   const messages = ref<Message[]>([])
   const conversationName = ref('')
   const isGroup = ref(false)
@@ -72,12 +71,13 @@ export function useConversation(conversationId: string) {
   // ── 傳送訊息 ─────────────────────────────────────────────────
 
   const sendMessage = async (content: string) => {
-    if (!content.trim() || isSending.value) return
+    const trimmed = content.trim()
+    if (!trimmed || isSending.value) return
     isSending.value = true
     try {
       await messagingService.sendMessage(supabase, {
         conversationId,
-        content: content.trim()
+        content: trimmed
       })
     } catch (err: any) {
       error.value = err.message ?? '傳送失敗'
@@ -92,8 +92,8 @@ export function useConversation(conversationId: string) {
   const deleteMessage = async (messageId: string) => {
     try {
       await messagingService.deleteMessage(supabase, messageId)
-      const idx = messages.value.findIndex(m => m.id === messageId)
-      if (idx !== -1) messages.value[idx].isDeleted = true
+      const msg = messages.value.find(m => m.id === messageId)
+      if (msg) msg.isDeleted = true
     } catch (err: any) {
       error.value = err.message ?? '刪除失敗'
     }
@@ -115,36 +115,39 @@ export function useConversation(conversationId: string) {
           filter: `conversation_id=eq.${conversationId}`
         },
         async (payload) => {
-          const raw = payload.new as DbMessage
+          try {
+            const raw = payload.new as DbMessage
 
-          // 取得 sender 資料
-          const { data: profile } = await supabase
-            .from('members')
-            .select('id, name, avatar_url')
-            .eq('id', raw.sender_id)
-            .single()
+            // 取得 sender 資料
+            const { data: profiles } = await supabase
+              .rpc('get_user_profiles', { user_ids: [raw.sender_id] })
 
-          const newMsg: Message = {
-            id: raw.id,
-            conversationId: raw.conversation_id,
-            senderId: raw.sender_id,
-            senderName: profile?.name ?? '未知成員',
-            senderAvatar: profile?.avatar_url ?? null,
-            content: raw.content,
-            messageType: raw.message_type as 'text' | 'image' | 'system',
-            imageUrl: raw.image_url,
-            isDeleted: raw.is_deleted,
-            isMine: raw.sender_id === currentUserId,
-            createdAt: raw.created_at
+            const profile = profiles?.[0] ?? null
+
+            const newMsg: Message = {
+              id: raw.id,
+              conversationId: raw.conversation_id,
+              senderId: raw.sender_id,
+              senderName: profile?.name ?? '未知成員',
+              senderAvatar: profile?.avatar_url ?? null,
+              content: raw.content,
+              messageType: raw.message_type as 'text' | 'image' | 'system',
+              imageUrl: raw.image_url,
+              isDeleted: raw.is_deleted,
+              isMine: raw.sender_id === currentUserId,
+              createdAt: raw.created_at
+            }
+
+            // 避免重複推入（自己傳送時 service 已加入）
+            if (!messages.value.some(m => m.id === newMsg.id)) {
+              messages.value.push(newMsg)
+            }
+
+            // 更新已讀
+            await messagingService.markAsRead(supabase, conversationId)
+          } catch (err) {
+            console.error('[useConversation] Realtime handler:', err)
           }
-
-          // 避免重複推入（自己傳送時 service 已加入）
-          if (!messages.value.some(m => m.id === newMsg.id)) {
-            messages.value.push(newMsg)
-          }
-
-          // 更新已讀
-          await messagingService.markAsRead(supabase, conversationId)
         }
       )
       .subscribe()
